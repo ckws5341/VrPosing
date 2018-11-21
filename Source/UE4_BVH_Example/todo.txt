@@ -1,0 +1,11 @@
+
+
+
+1. remove 'include windows.h' in MotionContainer.cpp, and rewrite with alterative functions.
+  - http://api.unrealengine.com/INT/API/Runtime/Core/HAL/FFileManagerGeneric/FindFiles/index.html
+  - http://api.unrealengine.com/INT/API/Runtime/Core/HAL/FFileManagerGeneric/index.html
+  - http://api.unrealengine.com/INT/API/Runtime/Core/Misc/FPaths/
+
+2. Asf/AMC reader, coordinate convertion.
+
+3. Fix bug of Keyframe selections.
