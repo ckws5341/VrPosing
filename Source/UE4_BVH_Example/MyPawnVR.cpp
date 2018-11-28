@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #include "MyPawnVR.h"
-
-
+#include "Components/InputComponent.h"
 // Sets default values
 AMyPawnVR::AMyPawnVR()
 {
@@ -43,11 +41,17 @@ void AMyPawnVR::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MCR->Activate(true);
 	MCL->Activate(true);
+
+	if (MCROn)
+		p1 = MCR->GetComponentLocation();
+	if (MCLOn)
+		p2 = MCL->GetComponentLocation();
 }
 
 // Called to bind functionality to input
 void AMyPawnVR::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("MCR_TriggerAction", EInputEvent::IE_Pressed, this, &AMyPawnVR::Input_MCR_TriggerAction_DOWN);
 	PlayerInputComponent->BindAction("MCR_TriggerAction", EInputEvent::IE_Released, this, &AMyPawnVR::Input_MCR_TriggerAction_UP);

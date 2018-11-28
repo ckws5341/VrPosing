@@ -40,17 +40,19 @@ public:
 	
 public:
 	FVector p1,p2;
-	
+	bool MCROn, MCLOn = false;
+
 	void Input_MCR_TriggerAction_DOWN() {
-		p1 = MCR->GetComponentLocation();
+		MCROn = true;
 	}
 	void Input_MCR_TriggerAction_UP() {
+		MCROn = false;
 	}
-
 	void Input_MCL_TriggerAction_DOWN() {
-		p2 = MCL->GetComponentLocation();
+		MCLOn = true;
 	}
 	void Input_MCL_TriggerAction_UP() {
+		MCLOn = false;
 	}
 	
 };
