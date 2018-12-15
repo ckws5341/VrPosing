@@ -215,8 +215,16 @@ void AMyActor::Tick(float DeltaTime)
 		AMyPawnVR* pVR = Cast<AMyPawnVR>(MyWorld->GetFirstPlayerController()->GetPawn());
 		if (pVR)
 		{
-			p0_ = pVR->p1;
-			p1_ = pVR->p2;
+			if (sqrt((p0_.X - pVR->p1.X)*(p0_.X - pVR->p1.X) + (p0_.Y - pVR->p1.Y) *
+				(p0_.Y - pVR->p1.Y) + (p0_.X - pVR->p1.Z) + (p0_.X - pVR->p1.Z)) < 5.f)
+			{
+				p0_ = pVR->p1;
+			}
+			if (sqrt((p1_.X - pVR->p2.X)*(p1_.X - pVR->p2.X) + (p1_.Y - pVR->p2.Y) *
+				(p1_.Y - pVR->p2.Y) + (p1_.X - pVR->p2.Z) + (p1_.X - pVR->p2.Z)) < 5.f)
+			{
+				p1_ = pVR->p2;
+			}
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%d"), p0_.X);
@@ -229,7 +237,7 @@ void AMyActor::Tick(float DeltaTime)
 	q.AddJointConstraint(PBS::SketchedQuery::J_RFOT, ue2cml( p1_) );
 	
 	const PBS::MotionDBforPBS *m_db = PBSAppVar::getSingleton()->motino_db();
-
+	
 	r.motion_ = 0;
 	if ( m_db->Search(q, r) )
 	{

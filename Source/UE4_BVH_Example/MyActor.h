@@ -17,7 +17,9 @@ public:
 	// Sets default values for this actor's properties
 	AMyActor();
 	virtual ~AMyActor();
-	FVector p0_, p1_;
+	FVector p0_ = { 1.f, 0.f, 0.f };
+	FVector p1_ = { -1.f, 0.f, 0.f };
+
 
 protected:
 	// Called when the game starts or when spawned

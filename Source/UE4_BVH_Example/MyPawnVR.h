@@ -39,7 +39,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCL;
 	
 public:
-	FVector p1,p2;
+	FVector p1 = { 1.f, 0.f, 0.f }; 
+	FVector p2 = { -1.f, 0.f, 0.f };
 	bool MCROn, MCLOn = false;
 
 	void Input_MCR_TriggerAction_DOWN() {
