@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h"
 #include "MyActor.h"
+#include "UserHandActorVR.h"
 #include "EngineUtils.h"
 #include "MyPawnVR.generated.h"
 

@@ -44,5 +44,6 @@ public:
 
 	ml::UE4Poser ml_u_poser_;					// 모션 캡쳐 데이터를 UE4 캐릭터 모델에 적용하는 절차를 처리하는 객체
 
+
 	
 };

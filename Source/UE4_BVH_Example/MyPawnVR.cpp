@@ -21,6 +21,8 @@ AMyPawnVR::AMyPawnVR()
 	MCR->MotionSource = FXRMotionControllerBase::RightHandSourceId;
 	MCR->Hand_DEPRECATED = EControllerHand::Right;
 
+
+
 	MCL = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_L"));
 	MCL->SetupAttachment(CameraRootComponent);
 	MCL->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
@@ -32,7 +34,6 @@ AMyPawnVR::AMyPawnVR()
 void AMyPawnVR::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
