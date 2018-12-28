@@ -201,7 +201,7 @@ bool RegisterObjectToTarget_UE4(const ObjectPointSet & in_obj_point_set, const T
 		cml::matrixd wm(4, 4);
 		wm(0, 0)=x[0];	wm(0, 1)=-x[1];	wm(0, 2)=0;	wm(0, 3)=x[2];
 		wm(1, 0)=x[1];	wm(1, 1)=1;	    wm(1, 2)=0;	wm(1, 3)=x[3];
-		wm(2, 0)=0;	    wm(2, 1)=x[0];	wm(2, 2)=0;	wm(2, 3)=0;
+		wm(2, 0)=0;	    wm(2, 1)=x[0];	wm(2, 2)=1;	wm(2, 3)=0;
 		wm(3, 0)=0;		wm(3, 1)=0;	    wm(3, 2)=0;	wm(3, 3)=1;
 
 		cml::matrixd pwm(4, 4);
