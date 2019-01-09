@@ -215,30 +215,45 @@ void AMyActor::Tick(float DeltaTime)
 		AMyPawnVR* pVR = Cast<AMyPawnVR>(MyWorld->GetFirstPlayerController()->GetPawn());
 		if (pVR)
 		{
-			if (sqrt((p0_.X - pVR->p1.X)*(p0_.X - pVR->p1.X) + (p0_.Y - pVR->p1.Y) *
-				(p0_.Y - pVR->p1.Y) + (p0_.X - pVR->p1.Z) + (p0_.X - pVR->p1.Z)) < 5.f)
-			{
+			if (GrapJointByHand(p0_, pVR->p1))
 				p0_ = pVR->p1;
-			}
-			if (sqrt((p1_.X - pVR->p2.X)*(p1_.X - pVR->p2.X) + (p1_.Y - pVR->p2.Y) *
-				(p1_.Y - pVR->p2.Y) + (p1_.X - pVR->p2.Z) + (p1_.X - pVR->p2.Z)) < 5.f)
-			{
+			if (GrapJointByHand(p1_, pVR->p1))
+				p1_ = pVR->p1;
+			if (GrapJointByHand(p2_, pVR->p1))
+				p2_ = pVR->p1;
+			if (GrapJointByHand(p3_, pVR->p1))
+				p3_ = pVR->p1;
+
+			if (GrapJointByHand(p0_, pVR->p2))
+				p0_ = pVR->p2;
+			if (GrapJointByHand(p1_, pVR->p2))
 				p1_ = pVR->p2;
-			}
+			if (GrapJointByHand(p2_, pVR->p2))
+				p2_ = pVR->p2;
+			if (GrapJointByHand(p3_, pVR->p2))
+				p3_ = pVR->p2;
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%d"), p0_.X);
 	DrawDebugSphere(GetWorld(), p1_, 10, 16, FColor(255, 0, 0), false);
 	DrawDebugSphere(GetWorld(), p0_, 10, 16, FColor(0, 255, 0), false);
-	
+	DrawDebugSphere(GetWorld(), p2_, 10, 16, FColor(255, 0, 0), false);
+	DrawDebugSphere(GetWorld(), p3_, 10, 16, FColor(0, 255, 0), false);
+	DrawDebugSphere(GetWorld(), p4_, 10, 16, FColor(255, 0, 0), false);
+
 	PBS::SearchResult r;
 	PBS::SketchedQuery q;
 	q.AddJointConstraint(PBS::SketchedQuery::J_LFOT, ue2cml( p0_) );
 	q.AddJointConstraint(PBS::SketchedQuery::J_RFOT, ue2cml( p1_) );
+
+	q.AddJointConstraint(PBS::SketchedQuery::J_LPAM, ue2cml(p2_));
+	q.AddJointConstraint(PBS::SketchedQuery::J_RPAM, ue2cml(p3_));
+
+	//q.AddJointConstraint(PBS::SketchedQuery::J_NECK, ue2cml(p4_));
 	
 	const PBS::MotionDBforPBS *m_db = PBSAppVar::getSingleton()->motino_db();
 	
-	r.motion_ = 0;
+
 	if ( m_db->Search(q, r) )
 	{
 		UE_LOG(LogTemp, Warning, TEXT("frame, %s, %d"), *FString(r.motion_->name().c_str()), r.frame_);
@@ -249,6 +264,7 @@ void AMyActor::Tick(float DeltaTime)
 	}
 
 	// Retrieved pose
+
 	if ( r.motion_ )
 	{
 		for ( int i=0; i<r.motion_->body()->num_joint(); i++ )
@@ -292,4 +308,10 @@ void AMyActor::Tick(float DeltaTime)
 	}
 	
 }
-
+bool AMyActor::GrapJointByHand(FVector joint, FVector hand)
+{
+	if (sqrt((joint.X - hand.X)*(joint.X - hand.X) + (joint.Y - hand.Y) *
+		(joint.Y - hand.Y) + (joint.Z - hand.Z) + (joint.Z - hand.Z)) < 5.f)
+		return true;
+	return false;
+}

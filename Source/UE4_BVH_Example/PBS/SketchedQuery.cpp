@@ -21,8 +21,8 @@ SketchedQuery::MapSketchToPmBody(SketchedQuery::BodyJointName s_joint)
 	case SketchedQuery::J_PELV:	return ml::PELVIS;
 	case SketchedQuery::J_LELB:	return ml::L_ELBOW;
 	case SketchedQuery::J_RELB:	return ml::R_ELBOW;
-	case SketchedQuery::J_LPAM:	return ml::L_PALM;
-	case SketchedQuery::J_RPAM:	return ml::R_PALM;
+	case SketchedQuery::J_LPAM:	return ml::L_WRIST;
+	case SketchedQuery::J_RPAM:	return ml::R_WRIST;
 	case SketchedQuery::J_LKNE:	return ml::L_KNEE;
 	case SketchedQuery::J_RKNE:	return ml::R_KNEE;
 	case SketchedQuery::J_LFOT:	return ml::L_FOOT;
@@ -47,8 +47,8 @@ SketchedQuery::MapPmToSketchBody(ml::JointTag pm_joint)
 	case ml::PELVIS:		return SketchedQuery::J_PELV;
 	case ml::L_ELBOW:		return SketchedQuery::J_LELB;
 	case ml::R_ELBOW:		return SketchedQuery::J_RELB;
-	case ml::L_PALM:		return SketchedQuery::J_LPAM;
-	case ml::R_PALM:		return SketchedQuery::J_RPAM;
+	case ml::L_WRIST:		return SketchedQuery::J_LPAM;
+	case ml::R_WRIST:		return SketchedQuery::J_RPAM;
 	case ml::L_KNEE:		return SketchedQuery::J_LKNE;
 	case ml::R_KNEE:		return SketchedQuery::J_RKNE;
 	case ml::L_FOOT:		return SketchedQuery::J_LFOT;

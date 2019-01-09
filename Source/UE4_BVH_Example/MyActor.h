@@ -17,9 +17,11 @@ public:
 	// Sets default values for this actor's properties
 	AMyActor();
 	virtual ~AMyActor();
-	FVector p0_ = { 1.f, 0.f, 0.f };
-	FVector p1_ = { -1.f, 0.f, 0.f };
-
+	FVector p0_ = { 10.f, 0.f, 0.f };
+	FVector p1_ = { -10.f, 0.f, 0.f };
+	FVector p2_ = { 50.f, 0.f, 90.f };
+	FVector p3_ = { -50.f, 0.f, 90.f };
+	FVector p4_ = { 0.f, 0.f, 150.f };
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,6 +46,7 @@ public:
 
 	ml::UE4Poser ml_u_poser_;					// 모션 캡쳐 데이터를 UE4 캐릭터 모델에 적용하는 절차를 처리하는 객체
 
+	bool GrapJointByHand(FVector joint, FVector hand);
 
 	
 };
