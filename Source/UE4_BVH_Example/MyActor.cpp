@@ -217,20 +217,20 @@ void AMyActor::Tick(float DeltaTime)
 		{
 			if (GrapJointByHand(p0_, pVR->p1))
 				p0_ = pVR->p1;
-			if (GrapJointByHand(p1_, pVR->p1))
+			else if (GrapJointByHand(p1_, pVR->p1))
 				p1_ = pVR->p1;
-			if (GrapJointByHand(p2_, pVR->p1))
+			else if (GrapJointByHand(p2_, pVR->p1))
 				p2_ = pVR->p1;
-			if (GrapJointByHand(p3_, pVR->p1))
+			else if (GrapJointByHand(p3_, pVR->p1))
 				p3_ = pVR->p1;
 
 			if (GrapJointByHand(p0_, pVR->p2))
 				p0_ = pVR->p2;
-			if (GrapJointByHand(p1_, pVR->p2))
+			else if (GrapJointByHand(p1_, pVR->p2))
 				p1_ = pVR->p2;
-			if (GrapJointByHand(p2_, pVR->p2))
+			else if (GrapJointByHand(p2_, pVR->p2))
 				p2_ = pVR->p2;
-			if (GrapJointByHand(p3_, pVR->p2))
+			else if (GrapJointByHand(p3_, pVR->p2))
 				p3_ = pVR->p2;
 		}
 	}
@@ -310,8 +310,8 @@ void AMyActor::Tick(float DeltaTime)
 }
 bool AMyActor::GrapJointByHand(FVector joint, FVector hand)
 {
-	if (sqrt((joint.X - hand.X)*(joint.X - hand.X) + (joint.Y - hand.Y) *
-		(joint.Y - hand.Y) + (joint.Z - hand.Z) + (joint.Z - hand.Z)) < 5.f)
+	if (sqrt((joint.X - hand.X)*(joint.X - hand.X) + (joint.Y - hand.Y)*(joint.Y - hand.Y) + 
+		(joint.Z - hand.Z)*(joint.Z - hand.Z)) < 5.f)
 		return true;
 	return false;
 }
