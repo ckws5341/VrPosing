@@ -267,23 +267,33 @@ void AMyActor::Tick(float DeltaTime)
 
 	if ( r.motion_ )
 	{
-		for ( int i=0; i<r.motion_->body()->num_joint(); i++ )
+		ml::Posture pose = r.motion_->posture(r.frame_);
+		pose.ApplyTransf(r.GetRegisteringTransf());
+
+		ml::Constraint con;
+		con.Push(pose.body()->joint_index(ml::L_ANKLE), ue2cml(p0_));
+		con.Push(pose.body()->joint_index(ml::R_ANKLE), ue2cml(p1_));
+		con.Push(pose.body()->joint_index(ml::L_WRIST), ue2cml(p2_));
+		con.Push(pose.body()->joint_index(ml::R_WRIST), ue2cml(p3_));
+		pose.IkFullBody(con);
+
+		for ( int i=0; i<pose.body()->num_joint(); i++ )
 		{
-			FVector p0 = cml2ue(r.GetRegisteredPmJoint(i));
+			FVector p0 = cml2ue(pose.GetGlobalTranslation(i));// r.GetRegisteredPmJoint(i));
 			
 			DrawDebugBox(GetWorld(), p0, FVector(2.f, 2.f, 2.f), FColor(0, 0, 255));
 
 			if ( i>0 )
 			{
-				FVector p1 = cml2ue(r.GetRegisteredPmJoint(r.motion_->body()->parent(i)));
+				FVector p1 = cml2ue(pose.GetGlobalTranslation(pose.body()->parent(i)));
 				DrawDebugLine(GetWorld(), p0, p1, FColor(0, 0, 255), false, -1.f, '\000', 3);
 			}
 		}
+
+		ml_u_poser_.Retarget( pose );
 	}
 
-	ml::Posture pose = r.motion_->posture(r.frame_);
-	pose.ApplyTransf(r.GetRegisteringTransf());
-	ml_u_poser_.Retarget( pose );
+	
 
 	if ( false )
 	{
