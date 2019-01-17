@@ -25,7 +25,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -38,12 +38,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCR;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCL;
-	
+
 public:
-	FVector p1 = { 1.f, 0.f, 0.f }; 
+	FVector p1 = { 1.f, 0.f, 0.f };
 	FVector p2 = { -1.f, 0.f, 0.f };
 	bool MCROn, MCLOn = false;
-
+	bool trackpadOn = false;
 	void Input_MCR_TriggerAction_DOWN() {
 		MCROn = true;
 	}
@@ -56,5 +56,6 @@ public:
 	void Input_MCL_TriggerAction_UP() {
 		MCLOn = false;
 	}
-	
+	//void Input_MCR_Trackpad1_DOWN();
+	//void Input_MCR_Trackpad1_UP();
 };

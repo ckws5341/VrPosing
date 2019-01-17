@@ -39,6 +39,7 @@ void AMyPawnVR::BeginPlay()
 // Called every frame
 void AMyPawnVR::Tick(float DeltaTime)
 {
+	
 	Super::Tick(DeltaTime);
 	MCR->Activate(true);
 	MCL->Activate(true);
@@ -47,6 +48,12 @@ void AMyPawnVR::Tick(float DeltaTime)
 		p1 = MCR->GetComponentLocation();
 	if (MCLOn)
 		p2 = MCL->GetComponentLocation();
+	if (trackpadOn)
+	{
+		FVector CurrentLoc = VRCameraComponent->GetComponentLocation();
+		CurrentLoc.Z += 10.0f;
+		VRCameraComponent->SetWorldLocation(CurrentLoc);
+	}
 }
 
 // Called to bind functionality to input
@@ -59,5 +66,15 @@ void AMyPawnVR::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("MCL_TriggerAction", EInputEvent::IE_Pressed, this, &AMyPawnVR::Input_MCL_TriggerAction_DOWN);
 	PlayerInputComponent->BindAction("MCL_TriggerAction", EInputEvent::IE_Released, this, &AMyPawnVR::Input_MCL_TriggerAction_UP);
 
+	//PlayerInputComponent->BindAction("MCR_Trackpad1", EInputEvent::IE_Pressed, this, &AMyPawnVR::Input_MCR_Trackpad1_DOWN);
+	//PlayerInputComponent->BindAction("MCR_Trackpad1", EInputEvent::IE_Released, this, &AMyPawnVR::Input_MCR_Trackpad1_UP);
+	// x,y,z축 이동부터 다시 시작
+	//PlayerInputComponent->BindAxis("MCR_Trackpad1", this, &AMyPawnVR::Input_MCR_Trackpad1_UP
 }
-
+/*void AMyPawnVR::Input_MCR_Trackpad1_DOWN()
+{
+	trackpadOn = true;
+}
+void AMyPawnVR::Input_MCR_Trackpad1_UP()
+{
+}*/

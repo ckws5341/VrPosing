@@ -132,7 +132,7 @@ bool RegisterObjectToTarget_UE4(const ObjectPointSet & in_obj_point_set, const T
 	// x is 4D vector, {cos(theta), sin(theta), translation x, translation y}. ***UE4
 	cml::matrixd A;
 	cml::vectord x, b;
-	const int num_equations = num_points*2;
+	const int num_equations = num_points * 2;
 	const int num_variables = num_points * 2;
 	if (num_variables > num_equations) return false;
 	{

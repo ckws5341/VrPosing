@@ -223,6 +223,8 @@ void AMyActor::Tick(float DeltaTime)
 				p2_ = pVR->p1;
 			else if (GrapJointByHand(p3_, pVR->p1))
 				p3_ = pVR->p1;
+			else if (GrapJointByHand(p4_, pVR->p1))
+				p4_ = pVR->p1;
 
 			if (GrapJointByHand(p0_, pVR->p2))
 				p0_ = pVR->p2;
@@ -232,6 +234,8 @@ void AMyActor::Tick(float DeltaTime)
 				p2_ = pVR->p2;
 			else if (GrapJointByHand(p3_, pVR->p2))
 				p3_ = pVR->p2;
+			else if (GrapJointByHand(p4_, pVR->p2))
+				p4_ = pVR->p2;
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%d"), p0_.X);
@@ -249,7 +253,7 @@ void AMyActor::Tick(float DeltaTime)
 	q.AddJointConstraint(PBS::SketchedQuery::J_LPAM, ue2cml(p2_));
 	q.AddJointConstraint(PBS::SketchedQuery::J_RPAM, ue2cml(p3_));
 
-	//q.AddJointConstraint(PBS::SketchedQuery::J_NECK, ue2cml(p4_));
+	q.AddJointConstraint(PBS::SketchedQuery::J_HEAD, ue2cml(p4_));
 	
 	const PBS::MotionDBforPBS *m_db = PBSAppVar::getSingleton()->motino_db();
 	
@@ -275,6 +279,7 @@ void AMyActor::Tick(float DeltaTime)
 		con.Push(pose.body()->joint_index(ml::R_ANKLE), ue2cml(p1_));
 		con.Push(pose.body()->joint_index(ml::L_WRIST), ue2cml(p2_));
 		con.Push(pose.body()->joint_index(ml::R_WRIST), ue2cml(p3_));
+		con.Push(pose.body()->joint_index(ml::HEAD), ue2cml(p4_));
 		pose.IkFullBody(con);
 
 		for ( int i=0; i<pose.body()->num_joint(); i++ )
