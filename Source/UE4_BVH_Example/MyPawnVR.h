@@ -56,6 +56,8 @@ public:
 	void Input_MCL_TriggerAction_UP() {
 		MCLOn = false;
 	}
-	//void Input_MCR_Trackpad1_DOWN();
-	//void Input_MCR_Trackpad1_UP();
+	void Move_XAxis(float AxisValue);
+	void Move_YAxis(float AxisValue);
+	void Move_ZAxis(float AxisValue);
+	FVector CurrentVelocity;
 };

@@ -265,7 +265,7 @@ void AMyActor::Tick(float DeltaTime)
 	else
 	{	
 		UE_LOG(LogTemp, Warning, TEXT("eeeframe"));
-	}
+	} 
 
 	// Retrieved pose
 
@@ -279,7 +279,7 @@ void AMyActor::Tick(float DeltaTime)
 		con.Push(pose.body()->joint_index(ml::R_ANKLE), ue2cml(p1_));
 		con.Push(pose.body()->joint_index(ml::L_WRIST), ue2cml(p2_));
 		con.Push(pose.body()->joint_index(ml::R_WRIST), ue2cml(p3_));
-		con.Push(pose.body()->joint_index(ml::HEAD), ue2cml(p4_));
+		con.Push(pose.body()->joint_index(ml::HEAD ), ue2cml(p4_));
 		pose.IkFullBody(con);
 
 		for ( int i=0; i<pose.body()->num_joint(); i++ )

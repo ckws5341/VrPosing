@@ -48,11 +48,11 @@ void AMyPawnVR::Tick(float DeltaTime)
 		p1 = MCR->GetComponentLocation();
 	if (MCLOn)
 		p2 = MCL->GetComponentLocation();
-	if (trackpadOn)
+	
+	if (!CurrentVelocity.IsZero())
 	{
-		FVector CurrentLoc = VRCameraComponent->GetComponentLocation();
-		CurrentLoc.Z += 10.0f;
-		VRCameraComponent->SetWorldLocation(CurrentLoc);
+		FVector NewLoc = GetActorLocation() + (CurrentVelocity * DeltaTime);
+		SetActorLocation(NewLoc);
 	}
 }
 
@@ -66,15 +66,20 @@ void AMyPawnVR::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("MCL_TriggerAction", EInputEvent::IE_Pressed, this, &AMyPawnVR::Input_MCL_TriggerAction_DOWN);
 	PlayerInputComponent->BindAction("MCL_TriggerAction", EInputEvent::IE_Released, this, &AMyPawnVR::Input_MCL_TriggerAction_UP);
 
-	//PlayerInputComponent->BindAction("MCR_Trackpad1", EInputEvent::IE_Pressed, this, &AMyPawnVR::Input_MCR_Trackpad1_DOWN);
-	//PlayerInputComponent->BindAction("MCR_Trackpad1", EInputEvent::IE_Released, this, &AMyPawnVR::Input_MCR_Trackpad1_UP);
-	// x,y,z축 이동부터 다시 시작
-	//PlayerInputComponent->BindAxis("MCR_Trackpad1", this, &AMyPawnVR::Input_MCR_Trackpad1_UP
+	PlayerInputComponent->BindAxis("MoveX", this, &AMyPawnVR::Move_XAxis);
+	PlayerInputComponent->BindAxis("MoveY", this, &AMyPawnVR::Move_YAxis);
+	PlayerInputComponent->BindAxis("MoveZ", this, &AMyPawnVR::Move_ZAxis);
 }
-/*void AMyPawnVR::Input_MCR_Trackpad1_DOWN()
+void AMyPawnVR::Move_XAxis(float AxisValue)
 {
-	trackpadOn = true;
+	CurrentVelocity.X = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.f;
 }
-void AMyPawnVR::Input_MCR_Trackpad1_UP()
+
+void AMyPawnVR::Move_YAxis(float AxisValue)
 {
-}*/
+	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.f;
+}
+void AMyPawnVR::Move_ZAxis(float AxisValue)
+{
+	CurrentVelocity.Z = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.f;
+}
