@@ -42,7 +42,7 @@ public:
 public:
 	FVector p1 = { 1.f, 0.f, 0.f };
 	FVector p2 = { -1.f, 0.f, 0.f };
-	bool MCROn, MCLOn = false;
+	bool MCROn, MCLOn, TelOn= false;
 	bool trackpadOn = false;
 	void Input_MCR_TriggerAction_DOWN() {
 		MCROn = true;
@@ -56,8 +56,11 @@ public:
 	void Input_MCL_TriggerAction_UP() {
 		MCLOn = false;
 	}
+	void Input_MCL_ShoulderAction_DOWN();
+	void Input_MCL_ShoulderAction_UP();
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
 	void Move_ZAxis(float AxisValue);
 	FVector CurrentVelocity;
+	FVector ActLoc;
 };

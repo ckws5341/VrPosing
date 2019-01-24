@@ -43,6 +43,7 @@ void AMyPawnVR::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MCR->Activate(true);
 	MCL->Activate(true);
+	UWorld *MyWorld = GetWorld();
 
 	if (MCROn)
 		p1 = MCR->GetComponentLocation();
@@ -54,6 +55,9 @@ void AMyPawnVR::Tick(float DeltaTime)
 		FVector NewLoc = GetActorLocation() + (CurrentVelocity * DeltaTime);
 		SetActorLocation(NewLoc);
 	}
+	if (TelOn)
+		ActLoc = GetActorLocation();
+
 }
 
 // Called to bind functionality to input
@@ -65,7 +69,8 @@ void AMyPawnVR::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("MCR_TriggerAction", EInputEvent::IE_Released, this, &AMyPawnVR::Input_MCR_TriggerAction_UP);
 	PlayerInputComponent->BindAction("MCL_TriggerAction", EInputEvent::IE_Pressed, this, &AMyPawnVR::Input_MCL_TriggerAction_DOWN);
 	PlayerInputComponent->BindAction("MCL_TriggerAction", EInputEvent::IE_Released, this, &AMyPawnVR::Input_MCL_TriggerAction_UP);
-
+	PlayerInputComponent->BindAction("MCL_ShoulderAction", EInputEvent::IE_Pressed, this, &AMyPawnVR::Input_MCL_ShoulderAction_DOWN);
+	PlayerInputComponent->BindAction("MCL_ShoulderAction", EInputEvent::IE_Released, this, &AMyPawnVR::Input_MCL_ShoulderAction_UP);
 	PlayerInputComponent->BindAxis("MoveX", this, &AMyPawnVR::Move_XAxis);
 	PlayerInputComponent->BindAxis("MoveY", this, &AMyPawnVR::Move_YAxis);
 	PlayerInputComponent->BindAxis("MoveZ", this, &AMyPawnVR::Move_ZAxis);
@@ -82,4 +87,12 @@ void AMyPawnVR::Move_YAxis(float AxisValue)
 void AMyPawnVR::Move_ZAxis(float AxisValue)
 {
 	CurrentVelocity.Z = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.f;
+}
+void AMyPawnVR::Input_MCL_ShoulderAction_DOWN()
+{
+	TelOn = true;
+}
+void AMyPawnVR::Input_MCL_ShoulderAction_UP()
+{
+	TelOn = false;
 }

@@ -237,6 +237,8 @@ void AMyActor::Tick(float DeltaTime)
 			else if (GrapJointByHand(p4_, pVR->p2))
 				p4_ = pVR->p2;
 		}
+		if (pVR->TelOn)
+			SetActorLocation(pVR->ActLoc);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%d"), p0_.X);
 	DrawDebugSphere(GetWorld(), p1_, 10, 16, FColor(255, 0, 0), false);
