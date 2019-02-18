@@ -21,7 +21,7 @@ bool RegisterObjectToTarget(const ObjectPointSet &in_obj_point_set, const Target
 	cml::matrixd A;
 	cml::vectord x, b;
 	const int num_equations = num_points*2;
-	const int num_variables = 4;
+	const int num_variables = num_points * 2;
 	if (num_variables > num_equations) return false;
 	{
 		A.resize(num_equations, num_variables);

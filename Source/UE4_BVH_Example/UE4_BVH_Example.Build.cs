@@ -8,7 +8,7 @@ public class UE4_BVH_Example : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OpenVR", "OSVRClientKit", "GoogleVR", "UE4Game", "ComponentVisualizers", "HeadMountedDisplay", "UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OpenVR", "OSVRClientKit", "GoogleVR", "UE4Game", "ComponentVisualizers", "HeadMountedDisplay", "UMG", "SteamVR" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

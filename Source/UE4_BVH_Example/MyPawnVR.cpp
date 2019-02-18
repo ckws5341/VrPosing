@@ -16,18 +16,24 @@ AMyPawnVR::AMyPawnVR()
 	VRCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("VRCamera"));
 	VRCameraComponent->SetupAttachment(CameraRootComponent);
 
+	HMD = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("HeadMountDisplay"));
+	HMD->SetupAttachment(CameraRootComponent);
+	HMD->MotionSource = FXRMotionControllerBase::HMDSourceId;
+
 	MCR = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_R"));
 	MCR->SetupAttachment(CameraRootComponent);
 	MCR->MotionSource = FXRMotionControllerBase::RightHandSourceId;
 	MCR->Hand_DEPRECATED = EControllerHand::Right;
 
-
-
 	MCL = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_L"));
 	MCL->SetupAttachment(CameraRootComponent);
 	MCL->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
 	MCL->Hand_DEPRECATED = EControllerHand::Left;
-
+	
+	TR1 = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Tracker1"));
+	TR1->SetupAttachment(CameraRootComponent);
+	//TR1->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
+	TR1->Hand_DEPRECATED = EControllerHand::Special_1;
 }
 
 // Called when the game starts or when spawned
@@ -44,12 +50,25 @@ void AMyPawnVR::Tick(float DeltaTime)
 	MCR->Activate(true);
 	MCL->Activate(true);
 	UWorld *MyWorld = GetWorld();
+	temp, d1, d2, d3 = { 0, 0, 0 };
+	FVector inv_Y = { 1.f, -1.f, 1.f };
 
-	if (MCROn)
-		p1 = MCR->GetComponentLocation();
-	if (MCLOn)
-		p2 = MCL->GetComponentLocation();
+	temp = p1;
+	p1 = MCR->GetComponentLocation();
+	d1 = p1 - temp;
+	d1 = d1 * inv_Y;
 	
+
+	temp = p2;
+	p2 = MCL->GetComponentLocation();
+	d2 = p2 - temp;
+	d2 = d2 * inv_Y;
+
+	temp = p3;
+	p3 = HMD->GetComponentLocation();
+	d3 = p3 - temp;
+	d3 = d3 * inv_Y;
+
 	if (!CurrentVelocity.IsZero())
 	{
 		FVector NewLoc = GetActorLocation() + (CurrentVelocity * DeltaTime);
@@ -57,7 +76,7 @@ void AMyPawnVR::Tick(float DeltaTime)
 	}
 	if (TelOn)
 		ActLoc = GetActorLocation();
-
+	
 }
 
 // Called to bind functionality to input

@@ -36,12 +36,15 @@ public:
 
 	UPROPERTY(EditAnywhere) UCameraComponent * VRCameraComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * HMD;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCR;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCL;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * TR1;
 public:
 	FVector p1 = { 1.f, 0.f, 0.f };
 	FVector p2 = { -1.f, 0.f, 0.f };
+	FVector p3 = { -1.f, 0.f, 0.f };
+	FVector d1, d2, d3, temp;
 	bool MCROn, MCLOn, TelOn= false;
 	bool trackpadOn = false;
 	void Input_MCR_TriggerAction_DOWN() {

@@ -144,34 +144,33 @@ bool AMyActor::InitPoseableCharacter()
 	// 각각의 캐릭터 모델의 신체 부위 이름은 제작자가 임의로 부여하기 때문에 서로 다를 것이다.
 	// ML library를 사용하기 위해서는 각 인체 부위에 사전에 약속된 이름(JointTag)을 부여하여야 한다.
 	// SetJointTag("캐릭터 모델 상의 신체 이름", "ML library에 정의 된 이름").
-	ml_u_poser_.SetJointTag("pelvis", ml::PELVIS);
-	ml_u_poser_.SetJointTag("spine_01", ml::SPINE);
-	ml_u_poser_.SetJointTag("spine_02", ml::SPINE1);
-	ml_u_poser_.SetJointTag("spine_03", ml::CHEST);
-	ml_u_poser_.SetJointTag("neck_01", ml::NECK);
-	ml_u_poser_.SetJointTag("head", ml::HEAD);
+	ml_u_poser_.SetJointTag("Bip001-Pelvis", ml::PELVIS); // pelvis
+	ml_u_poser_.SetJointTag("Bip001-Spine", ml::SPINE); // spine_01
+	ml_u_poser_.SetJointTag("Bip001-Spine1", ml::SPINE1); // spine_02
+	ml_u_poser_.SetJointTag("Bip001-Spine2", ml::CHEST); // spine_03
+	ml_u_poser_.SetJointTag("Bip001-Neck", ml::NECK); // neck_01
+	ml_u_poser_.SetJointTag("Bip001-Head", ml::HEAD); // head
 
-	ml_u_poser_.SetJointTag("thigh_r", ml::R_HIP);
-	ml_u_poser_.SetJointTag("calf_r", ml::R_KNEE);
-	ml_u_poser_.SetJointTag("foot_r", ml::R_ANKLE);
-	ml_u_poser_.SetJointTag("ball_r", ml::R_FOOT);
+	ml_u_poser_.SetJointTag("Bip001-R-Thigh", ml::R_HIP); // thigh_r
+	ml_u_poser_.SetJointTag("Bip001-R-Calf", ml::R_KNEE); // calf_r
+	ml_u_poser_.SetJointTag("Bip001-R-Foot", ml::R_ANKLE); //foot_r
+	ml_u_poser_.SetJointTag("Bip001-R-Toe0", ml::R_FOOT);//ball_r
 
-	ml_u_poser_.SetJointTag("thigh_l", ml::L_HIP);
-	ml_u_poser_.SetJointTag("calf_l", ml::L_KNEE);
-	ml_u_poser_.SetJointTag("foot_l", ml::L_ANKLE);
-	ml_u_poser_.SetJointTag("ball_l", ml::L_FOOT);
+	ml_u_poser_.SetJointTag("Bip001-L-Thigh", ml::L_HIP); // thigh_l
+	ml_u_poser_.SetJointTag("Bip001-L-Calf", ml::L_KNEE); // calf_l
+	ml_u_poser_.SetJointTag("Bip001-L-Foot", ml::L_ANKLE); //foot_l
+	ml_u_poser_.SetJointTag("Bip001-L-Toe0", ml::L_FOOT);//ball_l
 	
 
-	ml_u_poser_.SetJointTag("clavicle_r", ml::R_CLAVICLE);
-	ml_u_poser_.SetJointTag("upperarm_r", ml::R_SHOULDER);
-	ml_u_poser_.SetJointTag("lowerarm_r", ml::R_ELBOW);
-	ml_u_poser_.SetJointTag("hand_r", ml::R_WRIST);
+	ml_u_poser_.SetJointTag("Bip001-R-Clavicle", ml::R_CLAVICLE); // clavicle_r
+	ml_u_poser_.SetJointTag("Bip001-R-UpperArm", ml::R_SHOULDER); //upperarm_r
+	ml_u_poser_.SetJointTag("Bip001-R-Forearm", ml::R_ELBOW); // lowerarm_r
+	ml_u_poser_.SetJointTag("Bip001-R-Hand", ml::R_WRIST); // hand_r
 
-	ml_u_poser_.SetJointTag("clavicle_l", ml::L_CLAVICLE);
-	ml_u_poser_.SetJointTag("upperarm_l", ml::L_SHOULDER);
-	ml_u_poser_.SetJointTag("lowerarm_l", ml::L_ELBOW);
-	ml_u_poser_.SetJointTag("hand_l", ml::L_WRIST);
-
+	ml_u_poser_.SetJointTag("Bip001-L-Clavicle", ml::L_CLAVICLE); // clavicle_l
+	ml_u_poser_.SetJointTag("Bip001-L-UpperArm", ml::L_SHOULDER); //upperarm_l
+	ml_u_poser_.SetJointTag("Bip001-L-Forearm", ml::L_ELBOW); // lowerarm_l
+	ml_u_poser_.SetJointTag("Bip001-L-Hand", ml::L_WRIST); // hand_l
 
 	//// 2.3 위에 설정된 내용을 바탕으로 'ml_u_poser' 내부 데이터를 업데이트한다.
 	// 'BuildSkeleton()' 함수는 반드시 2.1과 2.2의 설정이 끝난후 실행되어야한다.
@@ -213,39 +212,53 @@ void AMyActor::Tick(float DeltaTime)
 	if (MyWorld)
 	{
 		AMyPawnVR* pVR = Cast<AMyPawnVR>(MyWorld->GetFirstPlayerController()->GetPawn());
-		if (pVR)
+		if (pVR->MCROn || pVR->MCLOn)
 		{
-			if (GrapJointByHand(p0_, pVR->p1))
-				p0_ = pVR->p1;
-			else if (GrapJointByHand(p1_, pVR->p1))
-				p1_ = pVR->p1;
-			else if (GrapJointByHand(p2_, pVR->p1))
-				p2_ = pVR->p1;
-			else if (GrapJointByHand(p3_, pVR->p1))
-				p3_ = pVR->p1;
-			else if (GrapJointByHand(p4_, pVR->p1))
-				p4_ = pVR->p1;
+			if (pVR->MCROn)
+			{
+				if (GrapJointByHand(p0_, pVR->p1))
+					p0_ = pVR->p1;
+				else if (GrapJointByHand(p1_, pVR->p1))
+					p1_ = pVR->p1;
+				else if (GrapJointByHand(p2_, pVR->p1))
+					p2_ = pVR->p1;
+				else if (GrapJointByHand(p3_, pVR->p1))
+					p3_ = pVR->p1;
+				else if (GrapJointByHand(p4_, pVR->p1))
+					p4_ = pVR->p1;
+				else if (GrapJointByHand(p5_, pVR->p1))
+					p5_ = pVR->p1;
+			}
+			if (pVR->MCLOn)
+			{
+				if (GrapJointByHand(p0_, pVR->p2))
+					p0_ = pVR->p2;
+				else if (GrapJointByHand(p1_, pVR->p2))
+					p1_ = pVR->p2;
+				else if (GrapJointByHand(p2_, pVR->p2))
+					p2_ = pVR->p2;
+				else if (GrapJointByHand(p3_, pVR->p2))
+					p3_ = pVR->p2;
+				else if (GrapJointByHand(p4_, pVR->p2))
+					p4_ = pVR->p2;
+				else if (GrapJointByHand(p5_, pVR->p2))
+					p5_ = pVR->p2;
+			}
 
-			if (GrapJointByHand(p0_, pVR->p2))
-				p0_ = pVR->p2;
-			else if (GrapJointByHand(p1_, pVR->p2))
-				p1_ = pVR->p2;
-			else if (GrapJointByHand(p2_, pVR->p2))
-				p2_ = pVR->p2;
-			else if (GrapJointByHand(p3_, pVR->p2))
-				p3_ = pVR->p2;
-			else if (GrapJointByHand(p4_, pVR->p2))
-				p4_ = pVR->p2;
+			p2_ = p2_ + pVR->d1;
+			p3_ = p3_ + pVR->d2;
+			p4_ = p4_ + pVR->d3;
 		}
 		if (pVR->TelOn)
 			SetActorLocation(pVR->ActLoc);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%d"), p0_.X);
 	DrawDebugSphere(GetWorld(), p1_, 10, 16, FColor(255, 0, 0), false);
-	DrawDebugSphere(GetWorld(), p0_, 10, 16, FColor(0, 255, 0), false);
-	DrawDebugSphere(GetWorld(), p2_, 10, 16, FColor(255, 0, 0), false);
+	DrawDebugSphere(GetWorld(), p0_, 10, 16, FColor(255, 0, 0), false);
+	DrawDebugSphere(GetWorld(), p2_, 10, 16, FColor(0, 255, 0), false);
 	DrawDebugSphere(GetWorld(), p3_, 10, 16, FColor(0, 255, 0), false);
-	DrawDebugSphere(GetWorld(), p4_, 10, 16, FColor(255, 0, 0), false);
+	DrawDebugSphere(GetWorld(), p4_, 10, 16, FColor(0, 0, 255), false);
+	DrawDebugSphere(GetWorld(), p5_, 10, 16, FColor(0, 0, 0), false);
 
 	PBS::SearchResult r;
 	PBS::SketchedQuery q;
@@ -256,8 +269,11 @@ void AMyActor::Tick(float DeltaTime)
 	q.AddJointConstraint(PBS::SketchedQuery::J_RPAM, ue2cml(p3_));
 
 	q.AddJointConstraint(PBS::SketchedQuery::J_HEAD, ue2cml(p4_));
-	
+	q.AddJointConstraint(PBS::SketchedQuery::J_PELV, ue2cml(p5_));
+
 	const PBS::MotionDBforPBS *m_db = PBSAppVar::getSingleton()->motino_db();
+	
+	
 	
 
 	if ( m_db->Search(q, r) )
@@ -281,7 +297,8 @@ void AMyActor::Tick(float DeltaTime)
 		con.Push(pose.body()->joint_index(ml::R_ANKLE), ue2cml(p1_));
 		con.Push(pose.body()->joint_index(ml::L_WRIST), ue2cml(p2_));
 		con.Push(pose.body()->joint_index(ml::R_WRIST), ue2cml(p3_));
-		con.Push(pose.body()->joint_index(ml::HEAD ), ue2cml(p4_));
+		con.Push(pose.body()->joint_index(ml::HEAD), ue2cml(p4_));
+		con.Push(pose.body()->joint_index(ml::PELVIS), ue2cml(p5_));
 		pose.IkFullBody(con);
 
 		for ( int i=0; i<pose.body()->num_joint(); i++ )
