@@ -102,6 +102,7 @@ void AMyActor::BeginPlay()
 
 
 }
+ 
 
 bool AMyActor::InitPoseableCharacter()
 {
@@ -244,10 +245,15 @@ void AMyActor::Tick(float DeltaTime)
 				else if (GrapJointByHand(p5_, pVR->p2))
 					p5_ = pVR->p2;
 			}
+			p0_ = p0_ + pVR->d4;
+			p1_ = p1_ + pVR->d5; // Foot
 
-			p2_ = p2_ + pVR->d1;
-			p3_ = p3_ + pVR->d2;
-			p4_ = p4_ + pVR->d3;
+			p2_ = p2_ + pVR->d1; 
+			p3_ = p3_ + pVR->d2; // Hand
+
+			p4_ = p4_ + pVR->d3; // Head
+		
+			p5_ = p5_ + pVR->d6; // Pelvis
 		}
 		if (pVR->TelOn)
 			SetActorLocation(pVR->ActLoc);

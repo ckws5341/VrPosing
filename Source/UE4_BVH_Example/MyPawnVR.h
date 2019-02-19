@@ -40,11 +40,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCR;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCL;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * TR1;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * TR2;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * TR3;
 public:
-	FVector p1 = { 1.f, 0.f, 0.f };
-	FVector p2 = { -1.f, 0.f, 0.f };
-	FVector p3 = { -1.f, 0.f, 0.f };
-	FVector d1, d2, d3, temp;
+	FVector p1, p2, p3, p4, p5, p6;
+	FVector d1, d2, d3, d4, d5, d6, temp;
 	bool MCROn, MCLOn, TelOn= false;
 	bool trackpadOn = false;
 	void Input_MCR_TriggerAction_DOWN() {

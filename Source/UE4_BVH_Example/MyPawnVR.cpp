@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "MyPawnVR.h"
+#include "Engine.h"
 #include "Components/InputComponent.h"
 // Sets default values
 AMyPawnVR::AMyPawnVR()
@@ -34,12 +35,23 @@ AMyPawnVR::AMyPawnVR()
 	TR1->SetupAttachment(CameraRootComponent);
 	//TR1->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
 	TR1->Hand_DEPRECATED = EControllerHand::Special_1;
+
+	TR2 = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Tracker2"));
+	TR2->SetupAttachment(CameraRootComponent);
+	//TR2->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
+	TR2->Hand_DEPRECATED = EControllerHand::Special_2;
+
+	TR3 = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Tracker3"));
+	TR3->SetupAttachment(CameraRootComponent);
+	//TR3->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
+	TR3->Hand_DEPRECATED = EControllerHand::Special_3;
 }
 
 // Called when the game starts or when spawned
 void AMyPawnVR::BeginPlay()
 {
 	Super::BeginPlay();
+	p1, p2, p3, p4, p5, p6 = { 0.f, 0.f, 0.f };
 }
 
 // Called every frame
@@ -50,24 +62,39 @@ void AMyPawnVR::Tick(float DeltaTime)
 	MCR->Activate(true);
 	MCL->Activate(true);
 	UWorld *MyWorld = GetWorld();
-	temp, d1, d2, d3 = { 0, 0, 0 };
-	FVector inv_Y = { 1.f, -1.f, 1.f };
+	temp, d1, d2, d3, d4, d5, d6 = { 0.f, 0.f, 0.f };
+	
+	FVector inv_ = { 1.f, -1.f, 1.f };
 
 	temp = p1;
 	p1 = MCR->GetComponentLocation();
 	d1 = p1 - temp;
-	d1 = d1 * inv_Y;
+	d1 = d1 * inv_;
 	
-
 	temp = p2;
 	p2 = MCL->GetComponentLocation();
 	d2 = p2 - temp;
-	d2 = d2 * inv_Y;
+	d2 = d2 * inv_;
 
 	temp = p3;
 	p3 = HMD->GetComponentLocation();
 	d3 = p3 - temp;
-	d3 = d3 * inv_Y;
+	d3 = d3 * inv_;
+
+	temp = p4;
+	p4 = TR1->GetComponentLocation();
+	d4 = p4 - temp;
+	d4 = d4 * inv_;
+
+	temp = p5;
+	p5 = TR2->GetComponentLocation();
+	d5 = p5 - temp;
+	d5 = d5 * inv_;
+
+	temp = p6;
+	p6 = TR3->GetComponentLocation();
+	d6 = p6 - temp;
+	d6 = d6 * inv_;
 
 	if (!CurrentVelocity.IsZero())
 	{
