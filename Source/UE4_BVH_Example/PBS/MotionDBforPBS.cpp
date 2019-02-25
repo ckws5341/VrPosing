@@ -262,12 +262,27 @@ MotionDBforPBS::BuildObjectPointSet(const PBS::TargetPointSet &in_target_point_s
 
 		if ( pm_joint_id == ml::HEAD )
 		{
+#ifdef UE4
+			if (m_frame.motion->body()->HasTag(ml::HEAD))
+			{
+				ObjectPoint o;
+				o.SetValue(m_frame.getGlobalTranslation(ml::HEAD) + cml::vector3d(0., 25., 0.));
+				out_object_point_set.push_back(o);
+			}
+			else 
+			{
+				ObjectPoint o;
+				o.SetValue(m_frame.getGlobalTranslation(ml::NECK) + cml::vector3d(0., 35., 0.));
+				out_object_point_set.push_back(o);
+			}
+#else
 			// We regard PmHuman::Head as the nose.
 			// As a user set a nose position, he or she can direct where the character have to look at.
-
 			ObjectPoint o;
-			o.SetValue( m_frame.getNoseGlobalTranslation() );
+			o.SetValue(m_frame.getNoseGlobalTranslation());
 			out_object_point_set.push_back(o);
+#endif
+			
 		}
 		else
 		{

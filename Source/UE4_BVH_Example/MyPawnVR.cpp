@@ -64,7 +64,7 @@ void AMyPawnVR::Tick(float DeltaTime)
 	UWorld *MyWorld = GetWorld();
 	temp, d1, d2, d3, d4, d5, d6 = { 0.f, 0.f, 0.f };
 	
-	FVector inv_ = { 1.f, -1.f, 1.f };
+	FVector inv_ = { -1.f, -1.f, 1.f };
 
 	temp = p1;
 	p1 = MCR->GetComponentLocation();

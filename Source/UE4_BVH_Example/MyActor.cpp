@@ -248,8 +248,8 @@ void AMyActor::Tick(float DeltaTime)
 			p0_ = p0_ + pVR->d4;
 			p1_ = p1_ + pVR->d5; // Foot
 
-			p2_ = p2_ + pVR->d1; 
-			p3_ = p3_ + pVR->d2; // Hand
+			p2_ = p2_ + pVR->d2; 
+			p3_ = p3_ + pVR->d1; // Hand
 
 			p4_ = p4_ + pVR->d3; // Head
 		
@@ -297,7 +297,7 @@ void AMyActor::Tick(float DeltaTime)
 	{
 		ml::Posture pose = r.motion_->posture(r.frame_);
 		pose.ApplyTransf(r.GetRegisteringTransf());
-
+		
 		ml::Constraint con;
 		con.Push(pose.body()->joint_index(ml::L_ANKLE), ue2cml(p0_));
 		con.Push(pose.body()->joint_index(ml::R_ANKLE), ue2cml(p1_));
