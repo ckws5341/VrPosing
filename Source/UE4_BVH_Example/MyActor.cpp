@@ -295,8 +295,12 @@ void AMyActor::Tick(float DeltaTime)
 
 	if ( r.motion_ )
 	{
+
+
 		ml::Posture pose = r.motion_->posture(r.frame_);
 		pose.ApplyTransf(r.GetRegisteringTransf());
+
+
 		
 		ml::Constraint con;
 		con.Push(pose.body()->joint_index(ml::L_ANKLE), ue2cml(p0_));
@@ -305,7 +309,8 @@ void AMyActor::Tick(float DeltaTime)
 		con.Push(pose.body()->joint_index(ml::R_WRIST), ue2cml(p3_));
 		con.Push(pose.body()->joint_index(ml::HEAD), ue2cml(p4_));
 		con.Push(pose.body()->joint_index(ml::PELVIS), ue2cml(p5_));
-		pose.IkFullBody(con);
+		//pose.IkFullBody(con);
+		pose.IkFullBodyAnalytic(con);
 
 		for ( int i=0; i<pose.body()->num_joint(); i++ )
 		{
@@ -320,7 +325,10 @@ void AMyActor::Tick(float DeltaTime)
 			}
 		}
 
+		
+		
 		ml_u_poser_.Retarget( pose );
+
 	}
 
 	

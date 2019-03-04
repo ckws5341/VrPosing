@@ -350,6 +350,16 @@ UE4Poser::UpdateCharacterPose()
 	if (!u_poseable_ || u_poseable_->GetNumBones() == 0)
 		return;
 
+	// for Smooth transition
+	static ml::Posture last_pose = posture_;
+	{
+		double w0 = 0.1;
+		double w1 = 0.9;
+		for (int i=0; i< posture_.body()->num_joint(); i++ ) {
+			posture_.rotate(i, cml::slerp(posture_.rotate(i), last_pose.rotate(i), w0));
+		}
+	}
+
 	// This function copies the global transformations of all bones of 'posture_' to the 'u_poseable_'.
 	// It assumes that the reference poses of 'posture_' and 'u_poseable_' are same as T-Pose.
 
@@ -386,7 +396,8 @@ UE4Poser::UpdateCharacterPose()
 				);
 		}
 	}
-	
+
+	last_pose = posture_;
 
 }
 

@@ -96,6 +96,59 @@ Posture::AddDisplacement( cml::vectord const& disp )
 }
 
 
+void ml::Posture::IkFullBodyAnalytic(Constraint const & c)
+{
+	constraint = c;
+
+	
+	oBody = body();
+
+
+	cml::transf t;
+	for (int i = 0; i < (int)c.num_entity(); i++)
+	{
+		if (c.entities()[i].mask & C_ORIENTATION)
+		{
+			SetGlobalRotation(c.entities()[i].joint, cml::mat3(c.entities()[i].value));
+			// t = c.entities[i].value * getBaseTransf(c.entity[i].link).inverse();
+			// rotate[c.entity[i].link] = t.getRotation();
+		}
+	}
+
+
+	// Limb IK
+	{
+		std::vector<int> end_joints;
+		end_joints.push_back(oBody->joint_index(PELVIS));
+		end_joints.push_back(oBody->joint_index(L_WRIST));
+		end_joints.push_back(oBody->joint_index(L_PALM));
+		end_joints.push_back(oBody->joint_index(L_ANKLE));
+		end_joints.push_back(oBody->joint_index(L_FOOT));
+		end_joints.push_back(oBody->joint_index(R_WRIST));
+		end_joints.push_back(oBody->joint_index(R_PALM));
+		end_joints.push_back(oBody->joint_index(R_ANKLE));
+		end_joints.push_back(oBody->joint_index(R_FOOT));
+
+		for (auto &j : end_joints)
+		{
+			const ml::ConstraintEntity *e = c.GetConstraintEntity(j);
+			if (e && e->mask & C_POSITION)
+			{
+				if (e->joint == 0)
+					SetGlobalTrans(cml::trans(e->value));
+				else 
+					IkLimb(j, cml::trans(e->value));
+			}
+
+			if (e && e->mask & C_ORIENTATION)
+			{
+				SetGlobalRotation(j, cml::mat3(e->value));
+			}
+
+		}
+	}
+}
+
 void Posture::IkFullBody(Constraint const& c)
 {
 	
