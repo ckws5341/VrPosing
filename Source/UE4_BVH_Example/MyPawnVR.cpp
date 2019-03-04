@@ -17,6 +17,9 @@ AMyPawnVR::AMyPawnVR()
 	VRCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("VRCamera"));
 	VRCameraComponent->SetupAttachment(CameraRootComponent);
 
+	//VRCamera2Component = CreateDefaultSubobject<UCameraComponent>(TEXT("VRCamera2"));
+	//VRCamera2Component->SetRelativeLocation(FVector(0.0f, 60.0f, 60.0f));
+
 	HMD = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("HeadMountDisplay"));
 	HMD->SetupAttachment(CameraRootComponent);
 	HMD->MotionSource = FXRMotionControllerBase::HMDSourceId;
@@ -51,7 +54,7 @@ AMyPawnVR::AMyPawnVR()
 void AMyPawnVR::BeginPlay()
 {
 	Super::BeginPlay();
-	p1, p2, p3, p4, p5, p6 = { 0.f, 0.f, 0.f };
+	p1, p2, p3, p4, p5, p6 = { 0.f, 1.f, 0.f };
 }
 
 // Called every frame

@@ -35,6 +35,7 @@ public:
 	UPROPERTY(EditAnywhere) USceneComponent * CameraRootComponent;
 
 	UPROPERTY(EditAnywhere) UCameraComponent * VRCameraComponent;
+	UPROPERTY(EditAnywhere) UCameraComponent * VRCamera2Component;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * HMD;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCR;

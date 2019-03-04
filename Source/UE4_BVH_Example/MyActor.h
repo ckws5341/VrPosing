@@ -17,12 +17,14 @@ public:
 	// Sets default values for this actor's properties
 	AMyActor();
 	virtual ~AMyActor();
-	FVector p0_ = { 15.f, 0.f, 0.f };
-	FVector p1_ = { -15.f, 0.f, 0.f };
-	FVector p2_ = { 80.f, 0.f, 120.f };
-	FVector p3_ = { -80.f, 0.f, 120.f };
-	FVector p4_ = { 0.f, 15.f, 140.f };
+	FVector p0_ = { 15.f, 0.f, -5.f };
+	FVector p1_ = { -15.f, 0.f, -5.f };
+	FVector p2_ = { 80.f, -10.f, 120.f };
+	FVector p3_ = { -80.f, -10.f, 120.f };
+	FVector p4_ = { 0.f, 15.f, 170.f };
 	FVector p5_ = { 0.f, 0.f, 90.f };
+	FVector p6_ = { 0.f,0.f,0.f };
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
