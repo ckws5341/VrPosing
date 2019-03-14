@@ -28,14 +28,13 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditAnywhere) USceneComponent * CameraRootComponent;
 
 	UPROPERTY(EditAnywhere) UCameraComponent * VRCameraComponent;
-	UPROPERTY(EditAnywhere) UCameraComponent * VRCamera2Component;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * HMD;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * MCR;
@@ -48,6 +47,9 @@ public:
 	FVector d1, d2, d3, d4, d5, d6, temp;
 	bool MCROn, MCLOn, TelOn= false;
 	bool trackpadOn = false;
+	cml::matrix33d mcrRotMat;
+	cml::matrix33d mclRotMat;
+
 	void Input_MCR_TriggerAction_DOWN() {
 		MCROn = true;
 	}
@@ -62,6 +64,8 @@ public:
 	}
 	void Input_MCL_ShoulderAction_DOWN();
 	void Input_MCL_ShoulderAction_UP();
+
+
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
 	void Move_ZAxis(float AxisValue);

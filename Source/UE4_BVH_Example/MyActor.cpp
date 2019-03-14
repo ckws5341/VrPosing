@@ -209,7 +209,9 @@ void AMyActor::Tick(float DeltaTime)
 	//p1_.Set(sin(-t)*50.f+100.f, cos(-t/2.f)*50.f, 10.f);
 
 	UWorld *MyWorld = GetWorld();
-	
+	cml::matrix33d m_mcr;
+	cml::matrix33d m_mcl;
+
 	if (MyWorld)
 	{
 		AMyPawnVR* pVR = Cast<AMyPawnVR>(MyWorld->GetFirstPlayerController()->GetPawn());
@@ -245,26 +247,30 @@ void AMyActor::Tick(float DeltaTime)
 				else if (GrapJointByHand(p5_, pVR->p2))
 					p5_ = pVR->p2;
 			}
-			p0_ = p0_ + pVR->d4;
-			p1_ = p1_ + pVR->d5; // Foot
+			p0_ =pVR->d4;
+			p1_ =pVR->d5; // Foot
 
-			p2_ = p2_ + pVR->d2; 
-			p3_ = p3_ + pVR->d1; // Hand
+			p2_ = pVR->d2; 
+			p3_ = pVR->d1; // Hand
 
-			p4_ = p4_ + pVR->d3; // Head
+			p4_ = pVR->d3; // Head
 		
-			p5_ = p5_ + pVR->d6; // Pelvis
+			p5_ = pVR->d6; // Pelvis
 		}
 		if (pVR->TelOn)
 			SetActorLocation(pVR->ActLoc);
+
+		m_mcl = (pVR->mclRotMat);
+		m_mcr = (pVR->mcrRotMat);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%d"), p0_.X);
-	DrawDebugSphere(GetWorld(), p1_, 10, 16, FColor(255, 0, 0), false);
-	DrawDebugSphere(GetWorld(), p0_, 10, 16, FColor(255, 0, 0), false);
-	DrawDebugSphere(GetWorld(), p2_, 10, 16, FColor(0, 255, 0), false);
-	DrawDebugSphere(GetWorld(), p3_, 10, 16, FColor(0, 255, 0), false);
-	DrawDebugSphere(GetWorld(), p4_, 10, 16, FColor(0, 0, 255), false);
-	DrawDebugSphere(GetWorld(), p5_, 10, 16, FColor(0, 0, 0), false);
+	DrawDebugBox(GetWorld(), p1_, FVector(6.f, 6.f, 6.f), FColor(255, 0, 0), false);
+	DrawDebugBox(GetWorld(), p0_, FVector(6.f, 6.f, 6.f), FColor(255, 0, 0), false);
+	DrawDebugBox(GetWorld(), p2_, FVector(6.f, 6.f, 6.f), FColor(0, 255, 0), false);
+	DrawDebugBox(GetWorld(), p3_, FVector(6.f, 6.f, 6.f), FColor(0, 255, 0), false);
+	DrawDebugBox(GetWorld(), p4_, FVector(6.f, 6.f, 6.f), FColor(0, 0, 255), false);
+	DrawDebugBox(GetWorld(), p5_, FVector(6.f, 6.f, 6.f), FColor(0, 0, 0), false);
+	
 
 	PBS::SearchResult r;
 	PBS::SketchedQuery q;
@@ -300,6 +306,11 @@ void AMyActor::Tick(float DeltaTime)
 		ml::Posture pose = r.motion_->posture(r.frame_);
 		pose.ApplyTransf(r.GetRegisteringTransf());
 
+		cml::matrix33d m; 
+	
+		m(0, 0) = 1.; m(1, 0) = 1.; m(2, 0) = 1.;
+		m(0, 1) = 1.; m(1, 1) = 1.; m(2, 1) = 1.; 
+		m(0, 2) = 1.; m(1, 2) = 1.; m(2, 2) = 1.;
 
 		
 		ml::Constraint con;
@@ -309,6 +320,9 @@ void AMyActor::Tick(float DeltaTime)
 		con.Push(pose.body()->joint_index(ml::R_WRIST), ue2cml(p3_));
 		con.Push(pose.body()->joint_index(ml::HEAD), ue2cml(p4_));
 		con.Push(pose.body()->joint_index(ml::PELVIS), ue2cml(p5_));
+
+		con.Push(pose.body()->joint_index(ml::L_WRIST), m_mcl);//방향값 입력(matrix)
+		con.Push(pose.body()->joint_index(ml::R_WRIST), m_mcr);
 		//pose.IkFullBody(con);
 		pose.IkFullBodyAnalytic(con);
 

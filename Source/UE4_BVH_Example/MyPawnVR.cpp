@@ -7,15 +7,16 @@ AMyPawnVR::AMyPawnVR()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 	CameraRootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("CameraRoot"));
 	CameraRootComponent->SetupAttachment(RootComponent);
-	CameraRootComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 60.0f));
+	CameraRootComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	VRCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("VRCamera"));
 	VRCameraComponent->SetupAttachment(CameraRootComponent);
+	VRCameraComponent->SetRelativeLocation(FVector(0.0f, 60.0f, 60.0f));
+	VRCameraComponent->bLockToHmd = false;
 
 	//VRCamera2Component = CreateDefaultSubobject<UCameraComponent>(TEXT("VRCamera2"));
 	//VRCamera2Component->SetRelativeLocation(FVector(0.0f, 60.0f, 60.0f));
@@ -48,6 +49,7 @@ AMyPawnVR::AMyPawnVR()
 	TR3->SetupAttachment(CameraRootComponent);
 	//TR3->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
 	TR3->Hand_DEPRECATED = EControllerHand::Special_3;
+
 }
 
 // Called when the game starts or when spawned
@@ -60,43 +62,82 @@ void AMyPawnVR::BeginPlay()
 // Called every frame
 void AMyPawnVR::Tick(float DeltaTime)
 {
-	
 	Super::Tick(DeltaTime);
 	MCR->Activate(true);
 	MCL->Activate(true);
 	UWorld *MyWorld = GetWorld();
 	temp, d1, d2, d3, d4, d5, d6 = { 0.f, 0.f, 0.f };
-	
+	FVector mid_ = { -70.f, 280.f, 250.f };
 	FVector inv_ = { -1.f, -1.f, 1.f };
 
-	temp = p1;
+	FRotator mcrRot = MCR->GetComponentRotation();
+	FRotator mclRot = MCL->GetComponentRotation();
+	FRotator hmdRot = HMD->GetComponentRotation();
+	FRotator tr1Rot = TR1->GetComponentRotation();
+	FRotator tr2Rot = TR2->GetComponentRotation();
+	FRotator tr3Rot = TR3->GetComponentRotation();
+
+	cml::matrix33d mcrRotRollMat;
+	mcrRotRollMat(0, 0) = cos(mcrRot.Roll); mcrRotRollMat(1, 0) = -sin(mcrRot.Roll); mcrRotRollMat(2, 0) = 0;
+	mcrRotRollMat(0, 1) = sin(mcrRot.Roll); mcrRotRollMat(1, 1) = cos(mcrRot.Roll); mcrRotRollMat(2, 1) = 0;
+	mcrRotRollMat(0, 2) = 0; mcrRotRollMat(1, 2) = 0; mcrRotRollMat(2, 2) = 1;
+
+	cml::matrix33d mcrRotPitchMat;
+	mcrRotPitchMat(0, 0) = 1; mcrRotPitchMat(1, 0) = 0; mcrRotPitchMat(2, 0) = 0;
+	mcrRotPitchMat(0, 1) = 0; mcrRotPitchMat(1, 1) = cos(mcrRot.Pitch); mcrRotPitchMat(2, 1) = -sin(mcrRot.Pitch);
+	mcrRotPitchMat(0, 2) = 0; mcrRotPitchMat(1, 2) = sin(mcrRot.Pitch); mcrRotPitchMat(2, 2) = cos(mcrRot.Pitch);
+
+	cml::matrix33d mcrRotYawMat;
+	mcrRotYawMat(0, 0) = cos(mcrRot.Yaw); mcrRotYawMat(1, 0) = 0; mcrRotYawMat(2, 0) = sin(mcrRot.Yaw);
+	mcrRotYawMat(0, 1) = 0; mcrRotYawMat(1, 1) = 1; mcrRotYawMat(2, 1) = 0;
+	mcrRotYawMat(0, 2) = -sin(mcrRot.Yaw); mcrRotYawMat(1, 2) = 0; mcrRotYawMat(2, 2) = cos(mcrRot.Yaw);
+
+	cml::matrix33d mclRotRollMat;
+	mclRotRollMat(0, 0) = cos(mclRot.Roll); mclRotRollMat(1, 0) = -sin(mclRot.Roll); mclRotRollMat(2, 0) = 0;
+	mclRotRollMat(0, 1) = sin(mclRot.Roll); mclRotRollMat(1, 1) = cos(mclRot.Roll); mclRotRollMat(2, 1) = 0;
+	mclRotRollMat(0, 2) = 0; mclRotRollMat(1, 2) = 0; mclRotRollMat(2, 2) = 1;
+
+	cml::matrix33d mclRotPitchMat;
+	mclRotPitchMat(0, 0) = 1; mclRotPitchMat(1, 0) = 0; mclRotPitchMat(2, 0) = 0;
+	mclRotPitchMat(0, 1) = 0; mclRotPitchMat(1, 1) = cos(mclRot.Pitch); mclRotPitchMat(2, 1) = -sin(mclRot.Pitch);
+	mclRotPitchMat(0, 2) = 0; mclRotPitchMat(1, 2) = sin(mclRot.Pitch); mclRotPitchMat(2, 2) = cos(mclRot.Pitch);
+
+	cml::matrix33d mclRotYawMat;
+	mclRotYawMat(0, 0) = cos(mclRot.Yaw); mclRotYawMat(1, 0) = 0; mclRotYawMat(2, 0) = sin(mclRot.Yaw);
+	mclRotYawMat(0, 1) = 0; mclRotYawMat(1, 1) = 1; mclRotYawMat(2, 1) = 0;
+	mclRotYawMat(0, 2) = -sin(mclRot.Yaw); mclRotYawMat(1, 2) = 0; mclRotYawMat(2, 2) = cos(mclRot.Yaw);
+
+	mcrRotMat = mcrRotYawMat * mcrRotPitchMat * mcrRotRollMat;
+	mclRotMat = mclRotYawMat * mclRotPitchMat * mclRotRollMat;
+
+	//temp = p1;
 	p1 = MCR->GetComponentLocation();
-	d1 = p1 - temp;
+	d1 = p1 - mid_;
 	d1 = d1 * inv_;
 	
-	temp = p2;
+	//temp = p2;
 	p2 = MCL->GetComponentLocation();
-	d2 = p2 - temp;
+	d2 = p2 - mid_;
 	d2 = d2 * inv_;
 
-	temp = p3;
+	//temp = p3;
 	p3 = HMD->GetComponentLocation();
-	d3 = p3 - temp;
+	d3 = p3 - mid_;
 	d3 = d3 * inv_;
 
-	temp = p4;
+	//temp = p4;
 	p4 = TR1->GetComponentLocation();
-	d4 = p4 - temp;
+	d4 = p4 - mid_;
 	d4 = d4 * inv_;
 
-	temp = p5;
+	//temp = p5;
 	p5 = TR2->GetComponentLocation();
-	d5 = p5 - temp;
+	d5 = p5 - mid_;
 	d5 = d5 * inv_;
 
-	temp = p6;
+	//temp = p6;
 	p6 = TR3->GetComponentLocation();
-	d6 = p6 - temp;
+	d6 = p6 - mid_;
 	d6 = d6 * inv_;
 
 	if (!CurrentVelocity.IsZero())
@@ -106,7 +147,7 @@ void AMyPawnVR::Tick(float DeltaTime)
 	}
 	if (TelOn)
 		ActLoc = GetActorLocation();
-	
+
 }
 
 // Called to bind functionality to input
