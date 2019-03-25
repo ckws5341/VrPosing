@@ -53,7 +53,18 @@ AMyPawnVR::AMyPawnVR()
 void AMyPawnVR::BeginPlay()
 {
 	Super::BeginPlay();
-	p1, p2, p3, p4, p5, p6 = { 0.f, 1.f, 0.f };
+	p1 = p2 = p3 = p4 = p5 = p6 = { 0.f, 1.f, 0.f };
+	d1 = d2 = d3 = d4 = d5 = d6 = temp = { 0.f, 0.f, 0.f };
+
+	for (auto &d : ms_ps)
+	{
+		d = FVector(0.f, 0.f, 0.f);
+	}
+
+	for (auto &d : ms_qs)
+	{
+		d = FQuat::Identity;
+	}
 }
 
 // Called every frame
@@ -63,9 +74,28 @@ void AMyPawnVR::Tick(float DeltaTime)
 	MCR->Activate(true);
 	MCL->Activate(true);
 	UWorld *MyWorld = GetWorld();
+
+
+	ms_ps[AMyActor::MS_HEAD] = HMD->GetComponentLocation();
+	ms_ps[AMyActor::MS_L_WRIST] = MCL->GetComponentLocation();
+	ms_ps[AMyActor::MS_R_WRIST] = MCR->GetComponentLocation();
+	ms_ps[AMyActor::MS_L_ANKLE] = TR1->GetComponentLocation();
+	ms_ps[AMyActor::MS_R_ANKLE] = TR2->GetComponentLocation();
+	ms_ps[AMyActor::MS_PELVIS] = TR3->GetComponentLocation();
+
+
+	ms_qs[AMyActor::MS_HEAD] = HMD->GetComponentQuat();
+	ms_qs[AMyActor::MS_L_WRIST] = MCL->GetComponentQuat();
+	ms_qs[AMyActor::MS_R_WRIST] = MCR->GetComponentQuat();
+	ms_qs[AMyActor::MS_L_ANKLE] = TR1->GetComponentQuat();
+	ms_qs[AMyActor::MS_R_ANKLE] = TR2->GetComponentQuat();
+	ms_qs[AMyActor::MS_PELVIS] = TR3->GetComponentQuat();
+
+
+
 	temp, d1, d2, d3, d4, d5, d6 = { 0.f, 0.f, 0.f };
-	FVector mid_ = { -70.f, 280.f, 250.f };
-	FVector inv_ = { -1.f, -1.f, 1.f };
+	//FVector mid_ = { -70.f, 180.f, 200.f };
+	//FVector inv_ = { -1.f, -1.f, 1.f };
 	
 	FQuat q = MCR->GetComponentQuat();
 	mcrRotMat = CalRotation(q);
@@ -82,32 +112,34 @@ void AMyPawnVR::Tick(float DeltaTime)
 	tr3RotMat = CalRotation(q);
 
 	//temp = p1;
-	p1 = MCR->GetComponentLocation();
-	d1 = p1;
+	d1 = p1 = MCR->GetComponentLocation();
+	//d1 = p1 -mid_;
+	//d1 = d1 * inv_;
 
 	//temp = p2;
-	p2 = MCL->GetComponentLocation();
-	d2 = p2;
+	d2 = p2 = MCL->GetComponentLocation();
+	//d2 = p2 -mid_;
+	//d2 = d2 * inv_;
 
 	//temp = p3;
-	p3 = HMD->GetComponentLocation();
-	d3 = p3 - mid_;
-	d3 = d3 * inv_;
+	d3 = p3 = HMD->GetComponentLocation();
+	//d3 = p3 - mid_;
+	//d3 = d3 * inv_;
 
 	//temp = p4;
-	p4 = TR1->GetComponentLocation();
-	d4 = p4 - mid_;
-	d4 = d4 * inv_;
+	d4 = p4 = TR1->GetComponentLocation();
+	//d4 = p4 - mid_;
+	//d4 = d4 * inv_;
 
 	//temp = p5;
-	p5 = TR2->GetComponentLocation();
-	d5 = p5 - mid_;
-	d5 = d5 * inv_;
+	d5 = p5 = TR2->GetComponentLocation();
+	//d5 = p5 - mid_;
+	//d5 = d5 * inv_;
 
 	//temp = p6;
-	p6 = TR3->GetComponentLocation();
-	d6 = p6 - mid_;
-	d6 = d6 * inv_;
+	d6 = p6 = TR3->GetComponentLocation();
+	//d6 = p6 - mid_;
+	//d6 = d6 * inv_;
 
 	if (!CurrentVelocity.IsZero())
 	{
@@ -133,6 +165,7 @@ void AMyPawnVR::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveX", this, &AMyPawnVR::Move_XAxis);
 	PlayerInputComponent->BindAxis("MoveY", this, &AMyPawnVR::Move_YAxis);
 	PlayerInputComponent->BindAxis("MoveZ", this, &AMyPawnVR::Move_ZAxis);
+	PlayerInputComponent->BindAction("ResetHumanT", EInputEvent::IE_Pressed, this, &AMyPawnVR::ResetHumanT);
 }
 void AMyPawnVR::Move_XAxis(float AxisValue)
 {
@@ -145,6 +178,7 @@ void AMyPawnVR::Move_YAxis(float AxisValue)
 }
 void AMyPawnVR::Move_ZAxis(float AxisValue)
 {
+	return;
 	CurrentVelocity.Z = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.f;
 }
 void AMyPawnVR::Input_MCL_ShoulderAction_DOWN()
@@ -159,7 +193,11 @@ void AMyPawnVR::Input_MCL_ShoulderAction_UP()
 cml::matrix33d AMyPawnVR::CalRotation(FQuat q)
 {
 	cml::matrix33d RotMat;
-	cml::quaterniond cml_q(q.W, q.X, q.Y, q.Z);
+	cml::quaterniond cml_q;
+	cml_q[cml::quaterniond::W] = q.W;
+	cml_q[cml::quaterniond::X] = q.X;
+	cml_q[cml::quaterniond::Y] = q.Y;
+	cml_q[cml::quaterniond::Z] = q.Z;
 
 	cml::matrix_rotation_quaternion(RotMat, cml_q);
 
@@ -168,4 +206,17 @@ cml::matrix33d AMyPawnVR::CalRotation(FQuat q)
 	RotMat(0, 2) = 2 * q.X*q.Z - 2 * q.W*q.Y; RotMat(1, 2) = 2 * q.Y*q.Z + 2 * q.W*q.X; RotMat(2, 2) = 1 - 2 * q.X*q.X - 2 * q.Y*q.Y;*/
 
 	return RotMat;
+}
+
+void AMyPawnVR::ResetHumanT()
+{
+
+	for (TActorIterator<AMyActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		// Same as with the Object Iterator, access the subclass instance with the * or -> operators.
+		if (ActorItr->GetName().Compare(TEXT("James")) == 0)
+		{
+			ActorItr->ResetHumanT();
+		}
+	}
 }

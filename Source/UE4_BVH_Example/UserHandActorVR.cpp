@@ -45,9 +45,9 @@ void AUserHandActorVR::Tick(float DeltaTime)
 		FVector p = { 1.f, 0.f, 0.f };
 		if (pVR)
 		{
-			if (pVR->p1 != p)
+			if (pVR->ms_ps[AMyActor::MS_R_WRIST] != p)
 			{
-				p = pVR->p1;
+				p = pVR->ms_ps[AMyActor::MS_R_WRIST];
 				
 			}
 		}

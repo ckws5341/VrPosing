@@ -40,9 +40,12 @@ SearchResult::GetRegisteringTransf() const
 
 	cml::transf t;
 
-	t = cml::MatrixRotationQuaternion(registering_rigid_transf_.r());
-	t = t * cml::MatrixTranslation(registering_rigid_transf_.t());
-	
+	/*t = cml::MatrixRotationQuaternion(registering_rigid_transf_.r());
+	t = t * cml::MatrixTranslation(registering_rigid_transf_.t());*/
+
+	t = cml::MatrixTranslation(registering_rigid_transf_.t());
+	t = t*cml::MatrixRotationQuaternion(registering_rigid_transf_.r());
+
 	return t;
 }
 

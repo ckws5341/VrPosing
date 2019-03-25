@@ -11,6 +11,7 @@
 #include <EngineGlobals.h>
 #include <Runtime/Engine/Classes/Engine/Engine.h>
 #include "DrawDebugHelpers.h"
+#include <sstream>
 
 // Sets default values
 AMyActor::AMyActor()
@@ -18,8 +19,14 @@ AMyActor::AMyActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	user_to_data_scale_t_.identity();
 
-	
+	flag_smooth = true;
+	flag_first_aftr_reset = true;
+	flag_hmd_retarget = true;
+	flag_pelvis_retarget = true;
+	flag_foot_retarget = true;
+	flag_display_pose_data = true;
 }
 
 AMyActor::~AMyActor()
@@ -35,6 +42,7 @@ void AMyActor::BeginPlay()
 
 	
 
+	flag_first_aftr_reset = true;
 
 
 
@@ -97,7 +105,6 @@ void AMyActor::BeginPlay()
 	motion_.editable_body()->SetJointTag("LeftArm", ml::L_SHOULDER);
 	motion_.editable_body()->SetJointTag("LeftForeArm", ml::L_ELBOW);
 	motion_.editable_body()->SetJointTag("LeftHand", ml::L_WRIST);
-
 
 
 
@@ -178,6 +185,15 @@ bool AMyActor::InitPoseableCharacter()
 	ml_u_poser_.BuildSkeleton();
 	
 
+	calibed_T_[MS_L_ANKLE] = cml::MatrixTranslation(p0_[0], p0_[1], p0_[2]);
+	calibed_T_[MS_R_ANKLE] = cml::MatrixTranslation(p1_[0], p1_[1], p1_[2]);
+	calibed_T_[MS_L_WRIST] = cml::MatrixTranslation(p2_[0], p2_[1], p2_[2]);
+	calibed_T_[MS_R_WRIST] = cml::MatrixTranslation(p3_[0], p3_[1], p3_[2]);
+	calibed_T_[MS_HEAD]    = cml::MatrixTranslation(p4_[0], p4_[1], p4_[2]);
+	calibed_T_[MS_PELVIS]  = cml::MatrixTranslation(p5_[0], p5_[1], p5_[2]);
+
+		
+
 	return true;
 
 }
@@ -198,6 +214,16 @@ static FVector cml2ue(cml::vector3d v)
 }
 
 
+static cml::quaterniond ue2cml(FQuat q)
+{
+	cml::quaterniond cml_q;
+	cml_q[cml_q.W] = q.W;
+	cml_q[cml_q.X] = q.X;
+	cml_q[cml_q.Y] = q.Y;
+	cml_q[cml_q.Z] = q.Z;
+	return cml_q;
+}
+
 // Called every frame
 void AMyActor::Tick(float DeltaTime)
 {
@@ -211,77 +237,68 @@ void AMyActor::Tick(float DeltaTime)
 	UWorld *MyWorld = GetWorld();
 	cml::matrix33d m_mcr;
 	cml::matrix33d m_mcl;
-
+	cml::matrix33d m_hmd, m_tr1, m_tr2, m_tr3;
 	if (MyWorld)
 	{
 		AMyPawnVR* pVR = Cast<AMyPawnVR>(MyWorld->GetFirstPlayerController()->GetPawn());
-		if (pVR->MCROn || pVR->MCLOn)
+		//if (pVR->MCROn || pVR->MCLOn)
 		{
-			/*if (pVR->MCROn)
+			// Calibration
 			{
-				if (GrapJointByHand(p0_, pVR->p1))
-					p0_ = pVR->p1;
-				else if (GrapJointByHand(p1_, pVR->p1))
-					p1_ = pVR->p1;
-				else if (GrapJointByHand(p2_, pVR->p1))
-					p2_ = pVR->p1;
-				else if (GrapJointByHand(p3_, pVR->p1))
-					p3_ = pVR->p1;
-				else if (GrapJointByHand(p4_, pVR->p1))
-					p4_ = pVR->p1;
-				else if (GrapJointByHand(p5_, pVR->p1))
-					p5_ = pVR->p1;
+				cml::matrix44d cur_user_T[6];
+
+				for (int i = 0; i < 6; i++)
+				{
+					cur_user_T[i] = cml::MatrixTranslation(ue2cml(pVR->ms_ps[i])) * cml::MatrixRotationQuaternion(ue2cml(pVR->ms_qs[i]));
+					calibed_T_[i] = cur_user_T[i] * user_to_data_calib_T_[i];
+				}
+
+				
 			}
-			if (pVR->MCLOn)
-			{
-				if (GrapJointByHand(p0_, pVR->p2))
-					p0_ = pVR->p2;
-				else if (GrapJointByHand(p1_, pVR->p2))
-					p1_ = pVR->p2;
-				else if (GrapJointByHand(p2_, pVR->p2))
-					p2_ = pVR->p2;
-				else if (GrapJointByHand(p3_, pVR->p2))
-					p3_ = pVR->p2;
-				else if (GrapJointByHand(p4_, pVR->p2))
-					p4_ = pVR->p2;
-				else if (GrapJointByHand(p5_, pVR->p2))
-					p5_ = pVR->p2;
-			}*/
-			p0_ =pVR->d4;
-			p1_ =pVR->d5; // Foot
-
-			p2_ = pVR->d2; 
-			p3_ = pVR->d1; // Hand
-
-			p4_ = pVR->d3; // Head
-		
-			p5_ = pVR->d6; // Pelvis
 		}
+		/*else
+		{
+			m_mcl = (pVR->mclRotMat);
+			m_mcr = (pVR->mcrRotMat);
+			m_hmd = (pVR->hmdRotMat);
+			m_tr1 = (pVR->tr1RotMat);
+			m_tr2 = (pVR->tr2RotMat);
+			m_tr3 = (pVR->tr3RotMat);
+		}*/
 		if (pVR->TelOn)
 			SetActorLocation(pVR->ActLoc);
 
-		m_mcl = (pVR->mclRotMat);
-		m_mcr = (pVR->mcrRotMat);
+		
 	}
+
+	
+
 	UE_LOG(LogTemp, Warning, TEXT("%d"), p0_.X);
-	DrawDebugBox(GetWorld(), p1_, FVector(6.f, 6.f, 6.f), FColor(255, 0, 0), false);
-	DrawDebugBox(GetWorld(), p0_, FVector(6.f, 6.f, 6.f), FColor(255, 0, 0), false);
-	DrawDebugBox(GetWorld(), p2_, FVector(6.f, 6.f, 6.f), FColor(0, 255, 0), false);
-	DrawDebugBox(GetWorld(), p3_, FVector(6.f, 6.f, 6.f), FColor(0, 255, 0), false);
-	DrawDebugBox(GetWorld(), p4_, FVector(6.f, 6.f, 6.f), FColor(0, 0, 255), false);
-	DrawDebugBox(GetWorld(), p5_, FVector(6.f, 6.f, 6.f), FColor(0, 0, 0), false);
+	DrawDebugBox(GetWorld(), cml2ue(cml::trans(calibed_T_[MS_L_ANKLE])), FVector(6.f, 6.f, 6.f), FColor(255, 0, 0), false);
+	DrawDebugBox(GetWorld(), cml2ue(cml::trans(calibed_T_[MS_R_ANKLE])), FVector(6.f, 6.f, 6.f), FColor(255, 0, 0), false);
+	DrawDebugBox(GetWorld(), cml2ue(cml::trans(calibed_T_[MS_L_WRIST])), FVector(6.f, 6.f, 6.f), FColor(0, 255, 0), false);
+	DrawDebugBox(GetWorld(), cml2ue(cml::trans(calibed_T_[MS_R_WRIST])), FVector(6.f, 6.f, 6.f), FColor(0, 255, 0), false);
+	DrawDebugBox(GetWorld(), cml2ue(cml::trans(calibed_T_[MS_HEAD])), FVector(6.f, 6.f, 6.f), FColor(0, 0, 255), false);
+	DrawDebugBox(GetWorld(), cml2ue(cml::trans(calibed_T_[MS_PELVIS])), FVector(6.f, 6.f, 6.f), FColor(0, 0, 0), false);
 	
 
 	PBS::SearchResult r;
 	PBS::SketchedQuery q;
-	//q.AddJointConstraint(PBS::SketchedQuery::J_LFOT, ue2cml( p0_) );
-	//q.AddJointConstraint(PBS::SketchedQuery::J_RFOT, ue2cml( p1_) );
 
-	q.AddJointConstraint(PBS::SketchedQuery::J_LPAM, ue2cml(p2_));
-	q.AddJointConstraint(PBS::SketchedQuery::J_RPAM, ue2cml(p3_));
+	if (flag_foot_retarget)
+	{
+		q.AddJointConstraint(PBS::SketchedQuery::J_LFOT, cml::trans(calibed_T_[MS_L_ANKLE]));
+		q.AddJointConstraint(PBS::SketchedQuery::J_RFOT, cml::trans(calibed_T_[MS_R_ANKLE]));
+	}
 
-	//q.AddJointConstraint(PBS::SketchedQuery::J_HEAD, ue2cml(p4_));
-	//q.AddJointConstraint(PBS::SketchedQuery::J_PELV, ue2cml(p5_));
+	q.AddJointConstraint(PBS::SketchedQuery::J_LPAM, cml::trans(calibed_T_[MS_L_WRIST]));
+	q.AddJointConstraint(PBS::SketchedQuery::J_RPAM, cml::trans(calibed_T_[MS_R_WRIST]));
+
+	if( flag_hmd_retarget )
+		q.AddJointConstraint(PBS::SketchedQuery::J_HEAD, cml::trans(calibed_T_[MS_HEAD]));
+
+	if (flag_pelvis_retarget)
+		q.AddJointConstraint(PBS::SketchedQuery::J_PELV, cml::trans(calibed_T_[MS_PELVIS]));
 
 	const PBS::MotionDBforPBS *m_db = PBSAppVar::getSingleton()->motino_db();
 	
@@ -290,73 +307,85 @@ void AMyActor::Tick(float DeltaTime)
 
 	if ( m_db->Search(q, r) )
 	{
-		UE_LOG(LogTemp, Warning, TEXT("frame, %s, %d"), *FString(r.motion_->name().c_str()), r.frame_);
+		std::stringstream sstr;
+		sstr << r.GetRegisteringTransf();
+
+		UE_LOG(LogTemp, Warning, TEXT("frame, %s, %d, %s"), *FString(r.motion_->name().c_str()), r.frame_, *FString(sstr.str().c_str()));
+
 	}
 	else
-	{	
+	{
 		UE_LOG(LogTemp, Warning, TEXT("eeeframe"));
-	} 
+	}
 
 	// Retrieved pose
 
-	if ( r.motion_ )
+	if (r.motion_)
 	{
-
-
 		ml::Posture pose = r.motion_->posture(r.frame_);
-		
+
 		pose.ApplyTransf(r.GetRegisteringTransf());
 
 
-		if (false&&last_pose_data.body())
+		// smooth
+		if (flag_smooth)
 		{
-			double w0 = 0.1;
-			double w1 = 0.9;
-			for (int i = 1; i < pose.body()->num_joint(); i++) {
-				pose.rotate(i, cml::slerp(last_pose_data.rotate(i), pose.rotate(i), w0));
-			}
-			//pose.trans(cml::vector3d(pose.trans()[0], cml::lerp(last_pose_data.trans()[1], pose.trans()[1], w0), pose.trans()[2]));
-			//pose.trans(cml::lerp(last_pose_data.trans(), pose.trans(), w0));
-
-		}
-
-
-		
-		ml::Constraint con;
-		con.Push(pose.body()->joint_index(ml::L_ANKLE), ue2cml(p0_));
-		con.Push(pose.body()->joint_index(ml::R_ANKLE), ue2cml(p1_));
-		con.Push(pose.body()->joint_index(ml::L_WRIST), ue2cml(p2_));
-		con.Push(pose.body()->joint_index(ml::R_WRIST), ue2cml(p3_));
-		con.Push(pose.body()->joint_index(ml::HEAD), ue2cml(p4_));
-		con.Push(pose.body()->joint_index(ml::PELVIS), ue2cml(p5_));
-
-		con.Push(pose.body()->joint_index(ml::L_WRIST), m_mcl);//방향값 입력(matrix)
-		con.Push(pose.body()->joint_index(ml::R_WRIST), m_mcr);
-		//pose.IkFullBody(con);
-		//pose.IkFullBodyAnalytic(con);
-
-		for ( int i=0; i<pose.body()->num_joint(); i++ )
-		{
-			FVector p0 = cml2ue(pose.GetGlobalTranslation(i));// r.GetRegisteredPmJoint(i));
-			
-			DrawDebugBox(GetWorld(), p0, FVector(2.f, 2.f, 2.f), FColor(0, 0, 255));
-
-			if ( i>0 )
+			if (!flag_first_aftr_reset)
 			{
-				FVector p1 = cml2ue(pose.GetGlobalTranslation(pose.body()->parent(i)));
-				DrawDebugLine(GetWorld(), p0, p1, FColor(0, 0, 255), false, -1.f, '\000', 3);
+				double w0 = 0.05;
+				for (int i = 0; i < pose.body()->num_joint(); i++) {
+					pose.rotate(i, cml::slerp(last_pose_data.rotate(i), pose.rotate(i), w0));
+				}
+				pose.trans(cml::lerp(last_pose_data.trans(), pose.trans(), w0));
 			}
 		}
 
-		
-		
-		ml_u_poser_.Retarget( pose );
+
+
+		ml::Constraint con;
+		if (flag_foot_retarget)
+		{
+			con.Push(pose.body()->joint_index(ml::L_ANKLE), calibed_T_[MS_L_ANKLE]);
+			con.Push(pose.body()->joint_index(ml::R_ANKLE), calibed_T_[MS_R_ANKLE]);
+		}
+
+		con.Push(pose.body()->joint_index(ml::L_WRIST), calibed_T_[MS_L_WRIST]);
+		con.Push(pose.body()->joint_index(ml::R_WRIST), calibed_T_[MS_R_WRIST]);
+
+		if ( flag_hmd_retarget )
+			con.Push(pose.body()->joint_index(ml::L_WRIST), calibed_T_[MS_HEAD]);
+
+		if (flag_pelvis_retarget)
+			con.Push(pose.body()->joint_index(ml::L_WRIST), calibed_T_[MS_PELVIS]);
+
+
+
+		//pose.IkFullBody(con);
+		pose.IkFullBodyAnalytic(con);
+
+		if (flag_display_pose_data)
+		{
+			for (int i = 0; i < pose.body()->num_joint(); i++)
+			{
+				FVector p0 = cml2ue(pose.GetGlobalTranslation(i));// r.GetRegisteredPmJoint(i));
+
+				DrawDebugBox(GetWorld(), p0, FVector(2.f, 2.f, 2.f), FColor(0, 0, 255));
+
+				if (i > 0)
+				{
+					FVector p1 = cml2ue(pose.GetGlobalTranslation(pose.body()->parent(i)));
+					DrawDebugLine(GetWorld(), p0, p1, FColor(0, 0, 255), false, -1.f, '\000', 3);
+				}
+			}
+		}
+
+
+
+		ml_u_poser_.Retarget(pose);
 
 
 		last_pose_data = pose;
 	}
-
-	
 
 	if ( false )
 	{
@@ -380,7 +409,92 @@ void AMyActor::Tick(float DeltaTime)
 
 	}
 	
+
+	flag_first_aftr_reset = false;
+
 }
+void AMyActor::ResetHumanT()
+{
+	flag_first_aftr_reset = true;
+	float data_height = 180.0f;
+
+	UWorld *MyWorld = GetWorld();
+	if (MyWorld)
+	{
+		AMyPawnVR* pVR = Cast<AMyPawnVR>(MyWorld->GetFirstPlayerController()->GetPawn());
+		
+		
+
+
+
+		float user_height = p4_[2] - p1_[2];
+		float user_to_data_scale = data_height / user_height;
+		cml::vector3 user_ground_center = ue2cml(pVR->ms_ps[MS_L_ANKLE] + pVR->ms_ps[MS_R_ANKLE]) / 2.0;
+
+		if (!flag_foot_retarget)
+		{
+			user_ground_center = ue2cml(pVR->ms_ps[MS_L_WRIST] + pVR->ms_ps[MS_R_WRIST]) / 2.0;
+		}
+
+		cml::matrix44d user_r;
+		cml::vector3d r2l = ue2cml(pVR->ms_ps[MS_L_WRIST] - pVR->ms_ps[MS_R_WRIST]);
+		r2l[2] = 0.;
+		cml::matrix_rotation_vec_to_vec(user_r, cml::vector3d(1., 0., 0.), cml::normalize(r2l));
+
+		user_to_data_scale_t_ = 
+			cml::MatrixTranslation((cml::vector3d)(user_ground_center))
+		* cml::MatrixUniformScaling(user_to_data_scale)
+		* cml::MatrixTranslation( (cml::vector3d)(-user_ground_center) );
+
+		// ground to waist 103.8
+		if (PBSAppVar::getSingleton()->motino_db()->size() > 0)
+		{
+			ml::Posture t_pose = PBSAppVar::getSingleton()->motino_db()->getMotion(0)->posture(0);
+			t_pose.SetIdentityPose();
+			t_pose.SetGlobalTrans(cml::vector3d(user_ground_center[0], user_ground_center[1], 103.8));
+			t_pose.SetGlobalRotation(0, cml::mat3(user_r));
+
+			for (int i = 0; i < t_pose.body()->num_joint(); i++)
+			{
+				FVector p0 = cml2ue(t_pose.GetGlobalTranslation(i));// r.GetRegisteredPmJoint(i));
+
+				DrawDebugBox(GetWorld(), p0, FVector(2.f, 2.f, 2.f), FColor(255, 0, 0), false, 10.f);
+
+				if (i > 0)
+				{
+					FVector p1 = cml2ue(t_pose.GetGlobalTranslation(t_pose.body()->parent(i)));
+					DrawDebugLine(GetWorld(), p0, p1, FColor(255, 0, 0), false, 10.f, '\000', 3);
+				}
+			}
+
+			cml::matrix44d data_Ts[6];
+			data_Ts[MS_HEAD]    = t_pose.GetGlobalTransf(ml::HEAD);
+			data_Ts[MS_L_WRIST] = t_pose.GetGlobalTransf(ml::L_WRIST);
+			data_Ts[MS_R_WRIST] = t_pose.GetGlobalTransf(ml::R_WRIST);
+			data_Ts[MS_L_ANKLE] = t_pose.GetGlobalTransf(ml::L_ANKLE);
+			data_Ts[MS_R_ANKLE] = t_pose.GetGlobalTransf(ml::R_ANKLE);
+			data_Ts[MS_PELVIS]  = t_pose.GetGlobalTransf(ml::PELVIS);
+
+			cml::matrix44d user_Ts[6];
+			for (int i = 0; i < 6; i++)
+			{
+				user_Ts[i] = cml::MatrixTranslation(ue2cml(pVR->ms_ps[i])) * cml::MatrixRotationQuaternion(ue2cml(pVR->ms_qs[i]));
+				user_to_data_calib_T_[i] = cml::inverse(user_Ts[i]) * data_Ts[i];
+			}
+
+
+			/*for (auto &d : user_to_data_calib_T_)
+			{
+				d = cml::MatrixTranslation(0., 0., 0.);
+			}*/
+
+
+
+		}
+	}
+}
+
+
 bool AMyActor::GrapJointByHand(FVector joint, FVector hand)
 {
 	if (sqrt((joint.X - hand.X)*(joint.X - hand.X) + (joint.Y - hand.Y)*(joint.Y - hand.Y) + 

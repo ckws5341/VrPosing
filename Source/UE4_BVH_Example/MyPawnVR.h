@@ -43,13 +43,24 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * TR1;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * TR2;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) UMotionControllerComponent * TR3;
-public:
+private:
 	FVector p1, p2, p3, p4, p5, p6;
 	FVector d1, d2, d3, d4, d5, d6, temp;
-	bool MCROn, MCLOn, TelOn= false;
-	bool trackpadOn = false;
 	cml::matrix33d mcrRotMat, mclRotMat, hmdRotMat;
 	cml::matrix33d tr1RotMat, tr2RotMat, tr3RotMat;
+
+public:
+	FVector ms_ps[6];
+	FQuat ms_qs[6];
+
+
+	
+
+	
+
+	bool MCROn, MCLOn, TelOn= false;
+	bool trackpadOn = false;
+	
 	void Input_MCR_TriggerAction_DOWN() {
 		MCROn = true;
 	}
@@ -69,6 +80,7 @@ public:
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
 	void Move_ZAxis(float AxisValue);
+	void ResetHumanT();
 
 	cml::matrix33d CalRotation(FQuat q);
 	FVector CurrentVelocity;

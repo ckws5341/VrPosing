@@ -17,12 +17,12 @@ public:
 	// Sets default values for this actor's properties
 	AMyActor();
 	virtual ~AMyActor();
-	FVector p0_ = { 15.f, 0.f, -5.f };
-	FVector p1_ = { -15.f, 0.f, -5.f };
-	FVector p2_ = { 80.f, -10.f, 120.f };
-	FVector p3_ = { -80.f, -10.f, 120.f };
-	FVector p4_ = { 0.f, 15.f, 170.f };
-	FVector p5_ = { 0.f, 0.f, 90.f };
+	FVector p0_ = { 15.f, 0.f, -5.f }; //left ankle
+	FVector p1_ = { -15.f, 0.f, -5.f }; // right ankle
+	FVector p2_ = { 80.f, -10.f, 120.f }; // left wrist
+	FVector p3_ = { -80.f, -10.f, 120.f }; // right wrist
+	FVector p4_ = { 0.f, 15.f, 170.f }; // head
+	FVector p5_ = { 0.f, 0.f, 90.f }; // pelvis
 
 protected:
 	// Called when the game starts or when spawned
@@ -34,10 +34,12 @@ protected:
 	*/
 	bool InitPoseableCharacter();
 
+	bool flag_first_aftr_reset;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void ResetHumanT();
 
 	
 	UPoseableMeshComponent *james_poseable_;	// 캐릭터 모델 객체에 대한 포인터
@@ -49,5 +51,24 @@ public:
 
 	bool GrapJointByHand(FVector joint, FVector hand);
 
+	cml::matrix44d user_to_data_scale_t_;
+
+	enum MS_NAME { MS_PELVIS = 0, MS_HEAD, MS_L_WRIST, MS_R_WRIST, MS_L_ANKLE, MS_R_ANKLE };
+	cml::matrix44d user_to_data_calib_T_[6];
+	cml::matrix44d calibed_T_[6];
+
 	ml::Posture last_pose_data;
+
+	UPROPERTY(EditAnywhere, Category="MyActor Op", BlueprintReadWrite)
+	bool flag_smooth;
+
+	UPROPERTY(EditAnywhere, Category = "MyActor Op", BlueprintReadWrite)
+	bool flag_hmd_retarget;
+	UPROPERTY(EditAnywhere, Category = "MyActor Op", BlueprintReadWrite)
+	bool flag_pelvis_retarget;
+	UPROPERTY(EditAnywhere, Category = "MyActor Op", BlueprintReadWrite)
+	bool flag_foot_retarget;
+	UPROPERTY(EditAnywhere, Category = "MyActor Op", BlueprintReadWrite)
+	bool flag_display_pose_data;
+
 };
