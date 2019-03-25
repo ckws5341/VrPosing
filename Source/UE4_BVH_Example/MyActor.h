@@ -49,5 +49,5 @@ public:
 
 	bool GrapJointByHand(FVector joint, FVector hand);
 
-	
+	ml::Posture last_pose_data;
 };

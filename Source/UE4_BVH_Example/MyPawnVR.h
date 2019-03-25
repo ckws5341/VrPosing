@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h"
 #include "MyActor.h"
+
 #include "UserHandActorVR.h"
 #include "EngineUtils.h"
 #include "MyPawnVR.generated.h"
@@ -47,9 +48,8 @@ public:
 	FVector d1, d2, d3, d4, d5, d6, temp;
 	bool MCROn, MCLOn, TelOn= false;
 	bool trackpadOn = false;
-	cml::matrix33d mcrRotMat;
-	cml::matrix33d mclRotMat;
-
+	cml::matrix33d mcrRotMat, mclRotMat, hmdRotMat;
+	cml::matrix33d tr1RotMat, tr2RotMat, tr3RotMat;
 	void Input_MCR_TriggerAction_DOWN() {
 		MCROn = true;
 	}
@@ -69,6 +69,8 @@ public:
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
 	void Move_ZAxis(float AxisValue);
+
+	cml::matrix33d CalRotation(FQuat q);
 	FVector CurrentVelocity;
 	FVector ActLoc;
 };

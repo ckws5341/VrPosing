@@ -217,7 +217,7 @@ void AMyActor::Tick(float DeltaTime)
 		AMyPawnVR* pVR = Cast<AMyPawnVR>(MyWorld->GetFirstPlayerController()->GetPawn());
 		if (pVR->MCROn || pVR->MCLOn)
 		{
-			if (pVR->MCROn)
+			/*if (pVR->MCROn)
 			{
 				if (GrapJointByHand(p0_, pVR->p1))
 					p0_ = pVR->p1;
@@ -246,7 +246,7 @@ void AMyActor::Tick(float DeltaTime)
 					p4_ = pVR->p2;
 				else if (GrapJointByHand(p5_, pVR->p2))
 					p5_ = pVR->p2;
-			}
+			}*/
 			p0_ =pVR->d4;
 			p1_ =pVR->d5; // Foot
 
@@ -274,14 +274,14 @@ void AMyActor::Tick(float DeltaTime)
 
 	PBS::SearchResult r;
 	PBS::SketchedQuery q;
-	q.AddJointConstraint(PBS::SketchedQuery::J_LFOT, ue2cml( p0_) );
-	q.AddJointConstraint(PBS::SketchedQuery::J_RFOT, ue2cml( p1_) );
+	//q.AddJointConstraint(PBS::SketchedQuery::J_LFOT, ue2cml( p0_) );
+	//q.AddJointConstraint(PBS::SketchedQuery::J_RFOT, ue2cml( p1_) );
 
 	q.AddJointConstraint(PBS::SketchedQuery::J_LPAM, ue2cml(p2_));
 	q.AddJointConstraint(PBS::SketchedQuery::J_RPAM, ue2cml(p3_));
 
-	q.AddJointConstraint(PBS::SketchedQuery::J_HEAD, ue2cml(p4_));
-	q.AddJointConstraint(PBS::SketchedQuery::J_PELV, ue2cml(p5_));
+	//q.AddJointConstraint(PBS::SketchedQuery::J_HEAD, ue2cml(p4_));
+	//q.AddJointConstraint(PBS::SketchedQuery::J_PELV, ue2cml(p5_));
 
 	const PBS::MotionDBforPBS *m_db = PBSAppVar::getSingleton()->motino_db();
 	
@@ -304,13 +304,22 @@ void AMyActor::Tick(float DeltaTime)
 
 
 		ml::Posture pose = r.motion_->posture(r.frame_);
+		
 		pose.ApplyTransf(r.GetRegisteringTransf());
 
-		cml::matrix33d m; 
-	
-		m(0, 0) = 1.; m(1, 0) = 1.; m(2, 0) = 1.;
-		m(0, 1) = 1.; m(1, 1) = 1.; m(2, 1) = 1.; 
-		m(0, 2) = 1.; m(1, 2) = 1.; m(2, 2) = 1.;
+
+		if (false&&last_pose_data.body())
+		{
+			double w0 = 0.1;
+			double w1 = 0.9;
+			for (int i = 1; i < pose.body()->num_joint(); i++) {
+				pose.rotate(i, cml::slerp(last_pose_data.rotate(i), pose.rotate(i), w0));
+			}
+			//pose.trans(cml::vector3d(pose.trans()[0], cml::lerp(last_pose_data.trans()[1], pose.trans()[1], w0), pose.trans()[2]));
+			//pose.trans(cml::lerp(last_pose_data.trans(), pose.trans(), w0));
+
+		}
+
 
 		
 		ml::Constraint con;
@@ -324,7 +333,7 @@ void AMyActor::Tick(float DeltaTime)
 		con.Push(pose.body()->joint_index(ml::L_WRIST), m_mcl);//방향값 입력(matrix)
 		con.Push(pose.body()->joint_index(ml::R_WRIST), m_mcr);
 		//pose.IkFullBody(con);
-		pose.IkFullBodyAnalytic(con);
+		//pose.IkFullBodyAnalytic(con);
 
 		for ( int i=0; i<pose.body()->num_joint(); i++ )
 		{
@@ -343,6 +352,8 @@ void AMyActor::Tick(float DeltaTime)
 		
 		ml_u_poser_.Retarget( pose );
 
+
+		last_pose_data = pose;
 	}
 
 	

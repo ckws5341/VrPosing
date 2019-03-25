@@ -2,6 +2,7 @@
 #include "MyPawnVR.h"
 #include "Engine.h"
 #include "Components/InputComponent.h"
+
 // Sets default values
 AMyPawnVR::AMyPawnVR()
 {
@@ -18,9 +19,6 @@ AMyPawnVR::AMyPawnVR()
 	VRCameraComponent->SetRelativeLocation(FVector(0.0f, 60.0f, 60.0f));
 	VRCameraComponent->bLockToHmd = false;
 
-	//VRCamera2Component = CreateDefaultSubobject<UCameraComponent>(TEXT("VRCamera2"));
-	//VRCamera2Component->SetRelativeLocation(FVector(0.0f, 60.0f, 60.0f));
-
 	HMD = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("HeadMountDisplay"));
 	HMD->SetupAttachment(CameraRootComponent);
 	HMD->MotionSource = FXRMotionControllerBase::HMDSourceId;
@@ -28,27 +26,26 @@ AMyPawnVR::AMyPawnVR()
 	MCR = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_R"));
 	MCR->SetupAttachment(CameraRootComponent);
 	MCR->MotionSource = FXRMotionControllerBase::RightHandSourceId;
-	MCR->Hand_DEPRECATED = EControllerHand::Right;
 
 	MCL = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_L"));
 	MCL->SetupAttachment(CameraRootComponent);
 	MCL->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
-	MCL->Hand_DEPRECATED = EControllerHand::Left;
 	
 	TR1 = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Tracker1"));
 	TR1->SetupAttachment(CameraRootComponent);
-	//TR1->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
-	TR1->Hand_DEPRECATED = EControllerHand::Special_1;
+	//TR1->Hand_DEPRECATED = EControllerHand::Special_1;
+	TR1->MotionSource;
+
 
 	TR2 = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Tracker2"));
 	TR2->SetupAttachment(CameraRootComponent);
-	//TR2->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
-	TR2->Hand_DEPRECATED = EControllerHand::Special_2;
+	//TR2->Hand_DEPRECATED = EControllerHand::Special_2;
+	TR2->MotionSource;
 
 	TR3 = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Tracker3"));
 	TR3->SetupAttachment(CameraRootComponent);
-	//TR3->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
-	TR3->Hand_DEPRECATED = EControllerHand::Special_3;
+	//TR3->Hand_DEPRECATED = EControllerHand::Special_3;
+	TR3->MotionSource;
 
 }
 
@@ -69,56 +66,28 @@ void AMyPawnVR::Tick(float DeltaTime)
 	temp, d1, d2, d3, d4, d5, d6 = { 0.f, 0.f, 0.f };
 	FVector mid_ = { -70.f, 280.f, 250.f };
 	FVector inv_ = { -1.f, -1.f, 1.f };
-
-	FRotator mcrRot = MCR->GetComponentRotation();
-	FRotator mclRot = MCL->GetComponentRotation();
-	FRotator hmdRot = HMD->GetComponentRotation();
-	FRotator tr1Rot = TR1->GetComponentRotation();
-	FRotator tr2Rot = TR2->GetComponentRotation();
-	FRotator tr3Rot = TR3->GetComponentRotation();
-
-	cml::matrix33d mcrRotRollMat;
-	mcrRotRollMat(0, 0) = cos(mcrRot.Roll); mcrRotRollMat(1, 0) = -sin(mcrRot.Roll); mcrRotRollMat(2, 0) = 0;
-	mcrRotRollMat(0, 1) = sin(mcrRot.Roll); mcrRotRollMat(1, 1) = cos(mcrRot.Roll); mcrRotRollMat(2, 1) = 0;
-	mcrRotRollMat(0, 2) = 0; mcrRotRollMat(1, 2) = 0; mcrRotRollMat(2, 2) = 1;
-
-	cml::matrix33d mcrRotPitchMat;
-	mcrRotPitchMat(0, 0) = 1; mcrRotPitchMat(1, 0) = 0; mcrRotPitchMat(2, 0) = 0;
-	mcrRotPitchMat(0, 1) = 0; mcrRotPitchMat(1, 1) = cos(mcrRot.Pitch); mcrRotPitchMat(2, 1) = -sin(mcrRot.Pitch);
-	mcrRotPitchMat(0, 2) = 0; mcrRotPitchMat(1, 2) = sin(mcrRot.Pitch); mcrRotPitchMat(2, 2) = cos(mcrRot.Pitch);
-
-	cml::matrix33d mcrRotYawMat;
-	mcrRotYawMat(0, 0) = cos(mcrRot.Yaw); mcrRotYawMat(1, 0) = 0; mcrRotYawMat(2, 0) = sin(mcrRot.Yaw);
-	mcrRotYawMat(0, 1) = 0; mcrRotYawMat(1, 1) = 1; mcrRotYawMat(2, 1) = 0;
-	mcrRotYawMat(0, 2) = -sin(mcrRot.Yaw); mcrRotYawMat(1, 2) = 0; mcrRotYawMat(2, 2) = cos(mcrRot.Yaw);
-
-	cml::matrix33d mclRotRollMat;
-	mclRotRollMat(0, 0) = cos(mclRot.Roll); mclRotRollMat(1, 0) = -sin(mclRot.Roll); mclRotRollMat(2, 0) = 0;
-	mclRotRollMat(0, 1) = sin(mclRot.Roll); mclRotRollMat(1, 1) = cos(mclRot.Roll); mclRotRollMat(2, 1) = 0;
-	mclRotRollMat(0, 2) = 0; mclRotRollMat(1, 2) = 0; mclRotRollMat(2, 2) = 1;
-
-	cml::matrix33d mclRotPitchMat;
-	mclRotPitchMat(0, 0) = 1; mclRotPitchMat(1, 0) = 0; mclRotPitchMat(2, 0) = 0;
-	mclRotPitchMat(0, 1) = 0; mclRotPitchMat(1, 1) = cos(mclRot.Pitch); mclRotPitchMat(2, 1) = -sin(mclRot.Pitch);
-	mclRotPitchMat(0, 2) = 0; mclRotPitchMat(1, 2) = sin(mclRot.Pitch); mclRotPitchMat(2, 2) = cos(mclRot.Pitch);
-
-	cml::matrix33d mclRotYawMat;
-	mclRotYawMat(0, 0) = cos(mclRot.Yaw); mclRotYawMat(1, 0) = 0; mclRotYawMat(2, 0) = sin(mclRot.Yaw);
-	mclRotYawMat(0, 1) = 0; mclRotYawMat(1, 1) = 1; mclRotYawMat(2, 1) = 0;
-	mclRotYawMat(0, 2) = -sin(mclRot.Yaw); mclRotYawMat(1, 2) = 0; mclRotYawMat(2, 2) = cos(mclRot.Yaw);
-
-	mcrRotMat = mcrRotYawMat * mcrRotPitchMat * mcrRotRollMat;
-	mclRotMat = mclRotYawMat * mclRotPitchMat * mclRotRollMat;
+	
+	FQuat q = MCR->GetComponentQuat();
+	mcrRotMat = CalRotation(q);
+	q = MCL->GetComponentQuat();
+	mclRotMat = CalRotation(q);
+	q = HMD->GetComponentQuat();
+	hmdRotMat = CalRotation(q);
+	
+	q = TR1->GetComponentQuat();
+	tr1RotMat = CalRotation(q);
+	q = TR2->GetComponentQuat();
+	tr2RotMat = CalRotation(q);
+	q = TR3->GetComponentQuat();
+	tr3RotMat = CalRotation(q);
 
 	//temp = p1;
 	p1 = MCR->GetComponentLocation();
-	d1 = p1 - mid_;
-	d1 = d1 * inv_;
-	
+	d1 = p1;
+
 	//temp = p2;
 	p2 = MCL->GetComponentLocation();
-	d2 = p2 - mid_;
-	d2 = d2 * inv_;
+	d2 = p2;
 
 	//temp = p3;
 	p3 = HMD->GetComponentLocation();
@@ -185,4 +154,18 @@ void AMyPawnVR::Input_MCL_ShoulderAction_DOWN()
 void AMyPawnVR::Input_MCL_ShoulderAction_UP()
 {
 	TelOn = false;
+}
+
+cml::matrix33d AMyPawnVR::CalRotation(FQuat q)
+{
+	cml::matrix33d RotMat;
+	cml::quaterniond cml_q(q.W, q.X, q.Y, q.Z);
+
+	cml::matrix_rotation_quaternion(RotMat, cml_q);
+
+	/*RotMat(0, 0) = 1 - 2 * q.Y*q.Y - 2 * q.Z*q.Z; RotMat(1, 0) = 2 * q.X*q.Y - 2 * q.W*q.Z; RotMat(2, 0) = 2 * q.X*q.Z + 2 * q.W*q.Y;
+	RotMat(0, 1) = 2 * q.X*q.Y + 2 * q.W*q.Z; RotMat(1, 1) = 1 - 2 * q.X*q.X - 2 * q.Z*q.Z; RotMat(2, 1) = 2 * q.Y*q.Z - 2 * q.W*q.X;
+	RotMat(0, 2) = 2 * q.X*q.Z - 2 * q.W*q.Y; RotMat(1, 2) = 2 * q.Y*q.Z + 2 * q.W*q.X; RotMat(2, 2) = 1 - 2 * q.X*q.X - 2 * q.Y*q.Y;*/
+
+	return RotMat;
 }
