@@ -29,13 +29,15 @@ PBSAppVar::PBSAppVar()
 			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/bboy_4/BBoy_re.asf", game_dir_str+"motion_100_num/bboy_4/", "BBoy_re");
 			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/emotional_7/mgman.asf", game_dir_str+"motion_100_num/emotional_7/", "mgman");
 			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/environment_3/wd2.asf", game_dir_str+"motion_100_num/environment_3/", "wd2");
-			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/freestyle_dance_12/wd2.asf", game_dir_str+"motion_100_num/freestyle_dance_12/", "wd2");
+			motion_db_->addMotionDir(game_dir_str+"motion_100_num/freestyle_dance_12/wd2.asf", game_dir_str+"motion_100_num/freestyle_dance_12/", "wd2");
 			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/generals_17/mgmg.asf", game_dir_str+"motion_100_num/generals_17/", "mgmg");
-			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/glof_2/wd2.asf", game_dir_str+"motion_100_num/glof_2/", "wd2");
-			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/locomotions_12/m1.asf", game_dir_str+"motion_100_num/locomotions_12/", "m1");
+			motion_db_->addMotionDir(game_dir_str+"motion_100_num/glof_2/wd2.asf", game_dir_str+"motion_100_num/glof_2/", "wd2");
 			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/table_tennis_6/wd2.asf", game_dir_str+"motion_100_num/table_tennis_6/", "wd2");
+
 			motion_db_->addMotionDir(game_dir_str+"motion_100_num/talking_with_12/wd2.asf", game_dir_str+"motion_100_num/talking_with_12/", "wd2");
-			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/tawkwon_15/wd2.asf", game_dir_str+"motion_100_num/tawkwon_15/", "wd2");
+
+			//motion_db_->addMotionDir(game_dir_str+"motion_100_num/locomotions_12/m1.asf", game_dir_str+"motion_100_num/locomotions_12/", "m1");
+			motion_db_->addMotionDir(game_dir_str+"motion_100_num/tawkwon_15/wd2.asf", game_dir_str+"motion_100_num/tawkwon_15/", "wd2");
 			//motion_db_->addMotionDir(game_dir_str+"etc/wd2.asf", game_dir_str+"etc", "wd2", 0);
 			//motion_db_->addMotionDir(game_dir_str+"etc/itonic3_wd2.asf", game_dir_str+"etc", "itonic3_wd2", 0);
 

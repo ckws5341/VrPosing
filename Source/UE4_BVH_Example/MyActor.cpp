@@ -353,10 +353,10 @@ void AMyActor::Tick(float DeltaTime)
 		con.Push(pose.body()->joint_index(ml::R_WRIST), calibed_T_[MS_R_WRIST]);
 
 		if ( flag_hmd_retarget )
-			con.Push(pose.body()->joint_index(ml::L_WRIST), calibed_T_[MS_HEAD]);
+			con.Push(pose.body()->joint_index(ml::HEAD), calibed_T_[MS_HEAD]);
 
 		if (flag_pelvis_retarget)
-			con.Push(pose.body()->joint_index(ml::L_WRIST), calibed_T_[MS_PELVIS]);
+			con.Push(pose.body()->joint_index(ml::PELVIS), calibed_T_[MS_PELVIS]);
 
 
 

@@ -109,10 +109,15 @@ void ml::Posture::IkFullBodyAnalytic(Constraint const & c)
 	{
 		if (c.entities()[i].mask & C_ORIENTATION)
 		{
-			SetGlobalRotation(c.entities()[i].joint, cml::mat3(c.entities()[i].value));
+			if ( c.entities()[i].joint !=0 )
+				SetGlobalRotation(c.entities()[i].joint, cml::mat3(c.entities()[i].value));
 			// t = c.entities[i].value * getBaseTransf(c.entity[i].link).inverse();
 			// rotate[c.entity[i].link] = t.getRotation();
 		}
+	}
+	// head
+	{
+
 	}
 
 
@@ -142,7 +147,8 @@ void ml::Posture::IkFullBodyAnalytic(Constraint const & c)
 
 			if (e && e->mask & C_ORIENTATION)
 			{
-				SetGlobalRotation(j, cml::mat3(e->value));
+				if (e->joint != 0)
+					SetGlobalRotation(j, cml::mat3(e->value));
 			}
 
 		}
